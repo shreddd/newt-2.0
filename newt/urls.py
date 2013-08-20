@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from testapi.views import TestView
+from newt.views import RootView
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -14,5 +14,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-    (r'^test/', TestView.as_view()),
+    (r'^/?$', RootView.as_view()),
+    (r'^status', include('status.urls')),
+
 )

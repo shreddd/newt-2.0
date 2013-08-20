@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'testapi',
+    'status',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -155,3 +156,8 @@ LOGGING = {
         },
     }
 }
+
+# Local NEWT Settings
+
+STATUS_URL = 'http://www.nersc.gov/REST/status/status_newt.php'
+
