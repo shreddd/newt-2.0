@@ -123,7 +123,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'testapi',
+    'newt',
+    'auth',
     'status',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
@@ -176,6 +177,24 @@ ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', 'petstore.swagger.wordnik.com' ]
 
 # NEWT Status API
 STATUS_URL = 'http://www.nersc.gov/REST/status/status_newt.php'
+
+NEWT_CONFIG = {
+    'SYSTEMS': [
+        {'NAME': 'hopper', 'HOSTNAME': 'hoppergrid.nersc.gov' },
+        {'NAME': 'edison', 'HOSTNAME': 'edisongrid.nersc.gov' },
+        {'NAME': 'carver', 'HOSTNAME': 'carvergrid.nersc.gov' },
+        {'NAME': 'pdsf', 'HOSTNAME': 'pdsfgrid.nersc.gov' },
+        {'NAME': 'dtn', 'HOSTNAME': 'dtn01.nersc.gov' },
+        {'NAME': 'archive', 'HOSTNAME': 'garchive.nersc.gov' },
+
+    ],
+    'ADAPTERS': {
+        'STATUS': 'status.adapters.passthrough_adapter',
+
+    }
+
+
+}
 
 
 

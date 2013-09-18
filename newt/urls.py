@@ -16,8 +16,10 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
 
-    (r'^$', RootView.as_view()),
+    (r'^api/?$', RootView.as_view()),
     (r'^api-docs/?(?P<path>\w+)?$', DocView.as_view()),
     (r'^api/status', include('status.urls')),
+    (r'^api/auth', include('auth.urls')),
+
 
 )

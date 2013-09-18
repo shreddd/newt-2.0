@@ -1,6 +1,6 @@
 # Create your views here.
 from django.views.generic.base import View
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseServerError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 import json
@@ -14,13 +14,30 @@ class JSONRestView(View):
     def dispatch(self, request, *args, **kwargs):
         # Wrap the dispatch method, so that we autoencode JSON
         response = super(JSONRestView, self).dispatch(request, *args, **kwargs)
+        # If this is a regular python object 
         if not isinstance(response, HttpResponse):
-            response = json.dumps(response, cls=DjangoJSONEncoder)
-            
-        # Possibly fill out the missing fields in the response
-        response = HttpResponse(response, content_type='application/json')
+            response = self.wrap_response(response)
+            response = HttpResponse(response, content_type='application/json')
+        # TODO: Think about how to handle django errors vs. newt erros
+        # How do you bubble up errors from NEWT?
+        else:
+            if response.status_code >= 200 and response.status_code <= 299:
+                response.content = self.wrap_response(response.content, status="OK", status_code=response.status_code, error = '')
+            else:
+                response.content = self.wrap_response('', status="ERROR", status_code=response.status_code, error = response.content)
 
         return response
+
+    def wrap_response(self, content, status="OK", status_code=200, error=""):
+        wrapper = {
+            'status': status,
+            'status_code': status_code,
+            'output': content,
+            'error': error
+        }
+        response = json.dumps(wrapper, cls=DjangoJSONEncoder)
+        return response
+
 
 class RootView(JSONRestView):
     def get(self, request):
@@ -28,14 +45,16 @@ class RootView(JSONRestView):
         The top level NEWT URL
         """
         response = {
-            "status": "OK",
-            "output": {
                 "text": "Welcome to NEWT",
                 "version": settings.NEWT_VERSION
-            },
-            "error": ""
         }
+
         return response
+
+    def post(self, request):
+        return HttpResponse("Not Implemented", status=501)
+
+
         
 class DocView(View):
     """
