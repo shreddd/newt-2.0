@@ -58,7 +58,7 @@ class StatusTests(TestCase):
 
 
 class AuthTests(TestCase):
-    payload = { 'username': "XXXX", 'password': "XXXX" }
+    payload = { 'username': "testuser", 'password': "test1pass" }
     def setUp(self):
         self.session = requests.Session()
 
