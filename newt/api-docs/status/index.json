@@ -1,0 +1,93 @@
+{
+
+    "apiVersion": "0.5.0",
+    "swaggerVersion": "1.2",
+    "basePath": "http://127.0.0.1:8000/api",
+    "resourcePath": "/status",
+    "produces": [
+        "application/json"
+    ],
+    "apis": [
+        {
+            "path": "/status/",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Status for all systems",
+                    "notes": "Returns an array of available systems and status",
+                    "nickname": "getStatus",
+                    "type": "array",
+                    "items":{
+                       "$ref": "System"
+                    },
+                    "produces": [
+                        "application/json"
+                    ],
+
+                    "responseMessages": [
+                        {
+                            "code": 500,
+                            "message": "Could not communicate with status server"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/status/{machine_name}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Status for a specific system",
+                    "notes": "Returns system status - one of \"up\", \"down\" or \"unknown\"",
+                    "nickname": "getSystemStatus",
+                    "type": "System",
+                    "produces": [
+                        "application/json"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "machine_name",
+                            "description": "The name of the system",
+                            "defaultValue": "hopper",
+                            "required": true,
+                            "allowMultiple": false,
+                            "type": "string",
+                            "paramType": "path"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 500,
+                            "message": "Could not communicate with status server"
+                        }
+                    ]
+                }
+            ]
+        }
+
+    ],
+    "models": {
+        "System": {
+            "id": "System",
+            "properties": {
+                "system": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Name of system"
+                },
+                "status": {
+                    "type": "string",
+                    "required": true,
+                    "description": "System status",
+                    "enum": [
+                      "up",
+                      "down",
+                      "unknown"
+                    ]
+                }
+            }
+        }
+    }
+
+}

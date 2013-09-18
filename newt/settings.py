@@ -1,4 +1,5 @@
 # Django settings for newt project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -100,6 +101,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'newt.crossdomain.CORSMiddleware',
+    
 )
 
 ROOT_URLCONF = 'newt.urls'
@@ -157,7 +160,22 @@ LOGGING = {
     }
 }
 
-# Local NEWT Settings
+# Base NEWT Settings
+PROJECT_DIR = os.path.dirname(os.path.dirname(__file__))
+NEWT_VERSION = "0.5.0"
 
+# CORS stuff
+# Allow cross site access to newt apps
+XS_SHARING_ALLOWED_ORIGINS='*'
+XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE', 'HEAD']
+# ALLOWED Networks for cross domain stuff
+ALLOWED_CIDRS = [ '128.3.0.0/16', '131.243.0.0/16', '128.55.0.0/16', '198.128.0.0/14' ]
+# Allow specific hostnames not included in ALLOWED_CIDRS
+ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', 'petstore.swagger.wordnik.com' ]
+
+
+# NEWT Status API
 STATUS_URL = 'http://www.nersc.gov/REST/status/status_newt.php'
+
+
 

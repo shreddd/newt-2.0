@@ -14,7 +14,7 @@ class StatusView(JSONRestView):
     def get(self, request, machine_name=None):
         
         try:
-            content = adapter.get(machine_name)
+            response = adapter.get(machine_name)
         except Exception as e:
             logger.error("Could not connect to Status Service %s" % str(e))
             return HttpResponseServerError("Could not connect to Status Service")  

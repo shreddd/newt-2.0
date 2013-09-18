@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from newt.views import RootView
+from newt.views import DocView
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -14,7 +15,9 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-    (r'^/?$', RootView.as_view()),
-    (r'^status', include('status.urls')),
+
+    (r'^$', RootView.as_view()),
+    (r'^api-docs/?(?P<path>\w+)?$', DocView.as_view()),
+    (r'^api/status', include('status.urls')),
 
 )
