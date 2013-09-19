@@ -1,6 +1,6 @@
 # Create your views here.
 from django.views.generic.base import View
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 import json
@@ -11,16 +11,22 @@ class JSONRestView(View):
     This is the core class that everything else should subclass in NEWT
     This provides all the hooks to make the JSON friendly
     """
+    
+    # TODO: Lots of edge cases we need to figure out first
     def dispatch(self, request, *args, **kwargs):
+        """
+        Override the dispatch method of the class view 
+        """
         # Wrap the dispatch method, so that we autoencode JSON
         response = super(JSONRestView, self).dispatch(request, *args, **kwargs)
         # If this is a regular python object 
         if not isinstance(response, HttpResponse):
             response = self.wrap_response(response)
             response = HttpResponse(response, content_type='application/json')
-        # TODO: Think about how to handle django errors vs. newt erros
+        # TODO: Think about how to handle django errors vs. newt errors
         # How do you bubble up errors from NEWT?
         else:
+            # Hmm - how do we deal with non JSON content? (binary files etc.)
             if response.status_code >= 200 and response.status_code <= 299:
                 response.content = self.wrap_response(response.content, status="OK", status_code=response.status_code, error = '')
             else:
@@ -29,6 +35,9 @@ class JSONRestView(View):
         return response
 
     def wrap_response(self, content, status="OK", status_code=200, error=""):
+        """
+        use a standard JSON wrapper
+        """
         wrapper = {
             'status': status,
             'status_code': status_code,
@@ -37,6 +46,21 @@ class JSONRestView(View):
         }
         response = json.dumps(wrapper, cls=DjangoJSONEncoder)
         return response
+
+    # By default return a 501 - each API call needs to implement what it needs
+    def get(self, request, *args, **kwargs):
+        return HttpResponse("Not Implemented", status=501)
+    
+    def post(self, request, *args, **kwargs):
+        return HttpResponse("Not Implemented", status=501)
+    
+    def put(self, request, *args, **kwargs):
+        return HttpResponse("Not Implemented", status=501)
+    
+    def delete(self, request, *args, **kwargs):
+        return HttpResponse("Not Implemented", status=501)
+    
+
 
 
 class RootView(JSONRestView):

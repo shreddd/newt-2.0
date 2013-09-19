@@ -1,16 +1,9 @@
 # Create your views here.
 from newt.views import JSONRestView
-from django.http import HttpResponseServerError
-from django.conf import settings
 
 from django.contrib.auth import authenticate, login, logout
 
-
-# from status.adapters import XXXX as adapter
-
 import logging
-import json
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +24,13 @@ class AuthView(JSONRestView):
 
 
     def get(self, request):
+        logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
+        
         return self.is_logged_in(request)
 
     def post(self, request):
+        logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
+        
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
@@ -44,6 +41,8 @@ class AuthView(JSONRestView):
 
 
     def delete(self, request):
+        logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
+        
         logout(request)
         return self.is_logged_in(request)
 
