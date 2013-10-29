@@ -189,7 +189,7 @@ NEWT_CONFIG = {
 
     ],
     'ADAPTERS': {
-        'STATUS': 'status.adapters.passthrough_adapter',
+        'STATUS': 'status.adapters.ping_adapter',
 
     }
 
