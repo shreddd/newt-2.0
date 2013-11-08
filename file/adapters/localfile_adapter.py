@@ -1,6 +1,12 @@
 
 from common.shell import run_command
 import re
+import magic
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 def get(machine_name, path):
     filehandle = open(path, 'r')
@@ -36,10 +42,16 @@ def get_dir(machine_name, path):
     # filter out stuff that doesn't match pattern
     output = filter(lambda line: patt.match(line), output)
     # break up line into tuple: (perms, hl, user, group, size, date, filename)        
-    output = map(lambda line: patt.match(line).groups(), output)
+    output = map(lambda line: patt.match(line).groups() + ("",) , output)
 
     # create a dict
-    output = map(lambda groups: dict(zip(('perms', 'hardlinks', 'user', 'group', 'size', 'date', 'name'), groups)), output)
+    output = map(lambda groups: dict(zip(('perms', 'hardlinks', 'user', 'group', 'size', 'date', 'name', 'symlink'), groups)), output)
+    
+    for line in output:
+        if line['perms'].startswith('l'):
+            name, symlink = line['name'].split(' -> ')
+            line['name'] = name
+            line['symlink'] = symlink
     
     return (output, error, retcode)
     
@@ -51,7 +63,7 @@ def get_mime_type(machine_name=None, path=None, file_handle=None):
         except Exception as e:
             logger.warning("Could not get mime type %s" % str(e))
             content_type = 'application/octet-stream'
-            file_handle.seek(0)
+        file_handle.seek(0)
     elif path:
         try:
             content_type = magic.from_file(path)
