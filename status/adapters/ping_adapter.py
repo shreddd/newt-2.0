@@ -21,9 +21,9 @@ def get(machine_name=None):
             
     else: 
         hostname = None
-        for s in conf.SYSTEMS:
+        for s in conf['SYSTEMS']:
             if machine_name==s['NAME']:
-                hostname = machine_name['HOSTNAME']
+                hostname = s['HOSTNAME']
                 break
 
         if hostname is None:

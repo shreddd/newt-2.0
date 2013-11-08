@@ -7,6 +7,19 @@ def get(machine_name, path):
     return filehandle
     
     
+def put(request, machine, path):
+
+    assert request.method == "PUT"
+
+    # The file contents are in the raw_post_data 
+    data = request.raw_post_data
+        
+    #Create tmp file
+    with open(path, 'w') as fh:
+        fh.write(data)
+    return {'location': request.path }
+    
+    
 def get_dir(machine_name, path):
     command = 'ls -la %s' % path
     (output, error, retcode) = run_command(command)
@@ -49,17 +62,6 @@ def get_mime_type(machine_name=None, path=None, file_handle=None):
         content_type = 'application/octet-stream'
     return content_type   
     
-    
-def put(request, machine, path):
-
-    assert request.method == "PUT"
-
-    # The file contents are in the raw_post_data 
-    data = request.raw_post_data
-        
-    #Create tmp file
-    with open(path, 'w') as fh
-        fh.write(data)
-    return {'location': request.path }
-    
+def get_systems():
+    return ['localhost']
      

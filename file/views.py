@@ -1,5 +1,5 @@
 from newt.views import JSONRestView
-from newt.common.response import json_response
+from common.response import json_response
 from django.http import HttpResponse, HttpResponseServerError, StreamingHttpResponse
 from django.conf import settings
 
@@ -11,6 +11,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+class FileRootView(JSONRestView):
+    def get(self, request):
+        logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
+        return file_adapter.get_systems()
 
 class FileView(JSONRestView):
     def get(self, request, machine_name, path):

@@ -1,6 +1,6 @@
 # Create your views here.
 from newt.views import JSONRestView
-from newt.common.response import json_response
+from common.response import json_response
 from django.http import HttpResponseServerError
 from django.conf import settings
 
@@ -18,7 +18,7 @@ class StatusView(JSONRestView):
         try:
             response = adapter.get(machine_name)
         except Exception as e:
-            logger.error("Could not get status %s" % str(e))
-            return json_response(error="Could not get status %s" % str(e), status="ERROR", status_code=500)  
+            logger.error("Could not get status: %s" % str(e))
+            return json_response(error="Could not get status: %s" % str(e), status="ERROR", status_code=500)  
             
         return response

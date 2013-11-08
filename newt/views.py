@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.http.response import HttpResponseBase
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
-from newt.common.response import json_response
+from common.response import json_response
 
 import json
 import os

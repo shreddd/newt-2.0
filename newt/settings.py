@@ -126,6 +126,7 @@ INSTALLED_APPS = (
     'newt',
     'auth',
     'status',
+    'file',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -186,12 +187,11 @@ NEWT_CONFIG = {
         {'NAME': 'pdsf', 'HOSTNAME': 'pdsfgrid.nersc.gov' },
         {'NAME': 'dtn', 'HOSTNAME': 'dtn01.nersc.gov' },
         {'NAME': 'archive', 'HOSTNAME': 'garchive.nersc.gov' },
-
+        {'NAME': 'localhost', 'HOSTNAME': 'localhost' },
     ],
     'ADAPTERS': {
         'STATUS': 'status.adapters.ping_adapter',
         'FILE': 'file.adapters.localfile_adapter',
-
     }
 
 
