@@ -1,4 +1,5 @@
 from newt.views import JSONRestView
+from newt.common.response import json_response
 from django.http import HttpResponse, HttpResponseServerError, StreamingHttpResponse
 from django.conf import settings
 
@@ -24,20 +25,17 @@ class FileView(JSONRestView):
                 return StreamingHttpResponse(file_handle, content_type=content_type)
             except Exception as e:
                 logger.error("Could not get file %s" % str(e))
-                json_response = self.wrap_response('', status="ERROR", status_code=500, error="Could not get file: %s" % str(e))
-                response = HttpResponseServerError(json_response, content_type='application/json')
-            
+                response = json_response(status="ERROR", status_code=500, error="Could not get file: %s" % str(e))            
         else:
             try:
-                response, err, retcode = file_adapter.get_dir(machine_name, path)
+                output, error, retcode = file_adapter.get_dir(machine_name, path)
                 if retcode!=0:
-                    json_response = self.wrap_response('', status="ERROR", status_code=500, error=err)
-                    response = HttpResponseServerError(json_response, content_type='application/json')
-                    
+                    response = json_response(content=output, status="ERROR", status_code=500, error=error)
+                else:
+                    response = output
             except Exception as e:
                 logger.error("Could not get directory %s" % str(e))
-                json_response = self.wrap_response('', status="ERROR", status_code=500, error="Could not get directory: %s" % str(e))
-                response = HttpResponseServerError(json_response, content_type='application/json')
+                response = json_response(status="ERROR", status_code=500, error="Could not get directory: %s" % str(e))
             
         return response
         
@@ -49,7 +47,6 @@ class FileView(JSONRestView):
             response = file_adapter.put(request, machine_name, path)
         except Exception as e:
             logger.error("Could not put file %s" % str(e))
-            json_response = self.wrap_response('', status="ERROR", status_code=500, error="Could not put file: %s" % str(e))
-            response = HttpResponseServerError(json_response, content_type='application/json')
+            response = json_response(status="ERROR", status_code=500, error="Could not put file: %s" % str(e))
         
         return response

@@ -45,7 +45,7 @@ def run_command(command, env=None, timeout=600):
     try:
         # Note - we can't rely on p.poll() to return a value since this deadlocks when the buffer fills up
         # p.communicate() will always returns on process completion
-        (output, err) = p.communicate()
+        (output, error) = p.communicate()
         retcode=p.poll()
         signal.alarm(0)  # reset the alarm
     except Alarm:
@@ -56,6 +56,6 @@ def run_command(command, env=None, timeout=600):
     if retcode != 0:
         # May not want to expose user to error
         #os.strerror(retcode)
-        logger.warning('command "%s", exit: %d <br> %s' % (command, retcode, err))
+        logger.warning('command "%s", exit: %d <br> %s' % (command, retcode, error))
   
-    return (output, err, retcode)
+    return (output, error, retcode)
