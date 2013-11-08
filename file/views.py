@@ -25,7 +25,7 @@ class FileView(JSONRestView):
         if request.GET.get('download', 'false')=='true':
             try:
                 file_handle = file_adapter.get(machine_name, path)
-                # Introspect the contents for mime_type from buffer
+                # Introspect the contents for mime_type either from path or buffer
                 content_type = file_adapter.get_mime_type(machine_name, path, file_handle)
                 return StreamingHttpResponse(file_handle, content_type=content_type)
             except Exception as e:
