@@ -1,6 +1,7 @@
 # Create your views here.
 from django.views.generic.base import View
 from django.http import HttpResponse
+from django.http.response import HttpResponseBase
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 import json
@@ -19,24 +20,16 @@ class JSONRestView(View):
         """
         # Wrap the dispatch method, so that we autoencode JSON
         response = super(JSONRestView, self).dispatch(request, *args, **kwargs)
-        # If this is a regular python object 
-        if not isinstance(response, HttpResponse):
+        # If this is not an HTTPResponseBase object (Base class for responses) 
+        if not isinstance(response, HttpResponseBase):
             response = self.wrap_response(response)
             response = HttpResponse(response, content_type='application/json')
-        # TODO: Think about how to handle django errors vs. newt errors
-        # How do you bubble up errors from NEWT?
-        else:
-            # Hmm - how do we deal with non JSON content? (binary files etc.)
-            if response.status_code >= 200 and response.status_code <= 299:
-                response.content = self.wrap_response(response.content, status="OK", status_code=response.status_code, error = '')
-            else:
-                response.content = self.wrap_response('', status="ERROR", status_code=response.status_code, error = response.content)
 
         return response
 
     def wrap_response(self, content, status="OK", status_code=200, error=""):
         """
-        use a standard JSON wrapper
+        Returns a JSON string with the default response
         """
         wrapper = {
             'status': status,

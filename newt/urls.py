@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     (r'^api/?$', RootView.as_view()),
     (r'^api-docs/?(?P<path>\w+)?$', DocView.as_view()),
     (r'^api/status', include('status.urls')),
+    (r'^api/file', include('file.urls')),
     (r'^api/auth', include('auth.urls')),
 
 

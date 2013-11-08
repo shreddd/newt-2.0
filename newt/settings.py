@@ -190,6 +190,7 @@ NEWT_CONFIG = {
     ],
     'ADAPTERS': {
         'STATUS': 'status.adapters.ping_adapter',
+        'FILE': 'file.adapters.localfile_adapter',
 
     }
 
