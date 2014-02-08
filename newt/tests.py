@@ -77,14 +77,17 @@ class CommandTests(TestCase):
 
 
     def test_command_with_args(self):
-        # Run ls in / which should always have "usr"
-        r = requests.post(newt_base_url+'/command/localhost', {'command': '/bin/ls -l /'})
+        # Run ls in / 
+        r = requests.post(newt_base_url+'/command/localhost', {'command': '/bin/ls -a /'})
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['status'], "OK")
-        self.assertIn('usr', json_response['output']['stdout'])
-        self.assertIn('drw', json_response['output']['stdout'])
-
+        # os.listdir() leaves off . and .. so add them in
+        files = ['.', '..'] + os.listdir('/')
+        files.sort()
+        newtfiles = json_response['output']['stdout'].strip().split('\n')
+        newtfiles.sort()
+        self.assertEquals(files, newtfiles)
 
 
 
