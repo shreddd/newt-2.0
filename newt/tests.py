@@ -92,7 +92,7 @@ class FileTests(TestCase):
         with open(tmpfile, 'w') as f:
             f.write('hello newt')
             
-        r = requests.get(newt_base_url+'/file/localhost/tmp/newt.txt?download=true')
+        r = requests.get(newt_base_url+'/file/localhost/tmp/tmp_newt.txt?download=true')
         self.assertEquals(r.status_code, 200)
         
         self.assertEquals(r.content, 'hello newt')

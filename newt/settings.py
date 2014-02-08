@@ -93,6 +93,11 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -128,10 +133,16 @@ INSTALLED_APPS = (
     'status',
     'file',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
 )
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -164,7 +175,15 @@ LOGGING = {
 
 # Base NEWT Settings
 PROJECT_DIR = os.path.dirname(os.path.dirname(__file__))
-NEWT_VERSION = "0.5.0"
+NEWT_VERSION = '0.5.0'
+NEWT_HOST = 'localhost'
+NEWT_DOMAIN = 'nersc.gov'
+MYPROXY_SERVER = 'nerscca2.nersc.gov'
+
+
+# SESSION_COOKIE_DOMAIN = NEWT_HOST
+# SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_NAME = 'newt_sessionid'
 
 # CORS stuff
 # Allow cross site access to newt apps
@@ -192,6 +211,8 @@ NEWT_CONFIG = {
     'ADAPTERS': {
         'STATUS': 'status.adapters.ping_adapter',
         'FILE': 'file.adapters.localfile_adapter',
+        'AUTH': 'auth.adapters.dbauth_adapter',
+
     }
 
 
