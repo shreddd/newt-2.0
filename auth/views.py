@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 class AuthView(JSONRestView):
 
-
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
         
@@ -23,8 +22,6 @@ class AuthView(JSONRestView):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
 
         return auth_adapter.post(request)        
-
-
 
     def delete(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))

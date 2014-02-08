@@ -212,6 +212,8 @@ NEWT_CONFIG = {
         'STATUS': 'status.adapters.ping_adapter',
         'FILE': 'file.adapters.localfile_adapter',
         'AUTH': 'auth.adapters.dbauth_adapter',
+        'COMMAND': 'command.adapters.exec_adapter',
+
 
     }
 

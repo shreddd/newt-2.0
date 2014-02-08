@@ -8,4 +8,6 @@ def post(machine_name, command):
         'retcode': retcode
     }
     return response
-    
+
+def get_systems():
+    return ['localhost']

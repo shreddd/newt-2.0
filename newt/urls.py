@@ -21,6 +21,6 @@ urlpatterns = patterns('',
     (r'^api/status', include('status.urls')),
     (r'^api/file', include('file.urls')),
     (r'^api/auth', include('auth.urls')),
-
+    (r'^api/command', include('command.urls')),
 
 )

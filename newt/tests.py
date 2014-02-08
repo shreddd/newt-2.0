@@ -5,6 +5,7 @@ when you run "manage.py test".
 
 from django.test import TestCase
 from django.conf import settings
+import socket
 import requests
 import os
 
@@ -56,6 +57,35 @@ class StatusTests(TestCase):
         self.assertEquals(json_response['status'], "OK")
 
         self.assertEquals(json_response['output']['status'], 'up')
+
+class CommandTests(TestCase):
+    def test_root(self):
+        r = requests.get(newt_base_url+'/command')
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['status'], "OK")
+        self.assertIn('localhost', json_response['output'])
+
+    def test_command(self):
+        r = requests.post(newt_base_url+'/command/localhost', {'command': '/bin/hostname'})
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['status'], "OK")
+
+        hostname = socket.gethostname()
+        self.assertEquals(hostname, json_response['output']['stdout'].strip())
+
+
+    def test_command_with_args(self):
+        # Run ls in / which should always have "usr"
+        r = requests.post(newt_base_url+'/command/localhost', {'command': '/bin/ls -l /'})
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['status'], "OK")
+        self.assertIn('usr', json_response['output']['stdout'])
+        self.assertIn('drw', json_response['output']['stdout'])
+
+
 
 
 class FileTests(TestCase):
