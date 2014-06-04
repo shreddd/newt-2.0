@@ -17,13 +17,53 @@ def put(request, machine, path):
 
     assert request.method == "PUT"
 
-    # The file contents are in the raw_post_data 
-    data = request.raw_post_data
-        
-    #Create tmp file
-    with open(path, 'w') as fh:
-        fh.write(data)
-    return {'location': request.path }
+    upload_handlers = request.upload_handlers
+    content_type   = str(request.META.get('CONTENT_TYPE', ""))
+    content_length = int(request.META.get('CONTENT_LENGTH', 0))
+
+    if content_type == "":
+        return HttpResponse(status=400)
+    if content_length == 0:
+        # both returned 0
+        return HttpResponse(status=400)
+
+    content_type = content_type.split(";")[0].strip()
+    try:
+        charset = content_type.split(";")[1].strip()
+    except IndexError:
+        charset = ""
+    counters = [0]*len(upload_handlers)
+
+    for handler in upload_handlers:
+        result = handler.handle_raw_input("",request.META,content_length,"","")
+
+    for handler in upload_handlers:
+        try:
+            handler.new_file("file", "test.pdf", 
+                             content_type, content_length, charset)
+        except Exception:
+            break
+
+    for i, handler in enumerate(upload_handlers):
+        while True:
+            chunk = request.read(handler.chunk_size)
+            if chunk:
+
+                handler.receive_data_chunk(chunk, counters[i])
+                counters[i] += len(chunk)
+            else:
+                # no chunk
+                break
+
+    for i, handler in enumerate(upload_handlers):
+        file_obj = handler.file_complete(counters[i])
+        if not file_obj:
+            raise Exception("Upload Error")
+        else:
+            with open(path, "w") as fh:
+                file_obj.seek(0)
+                fh.write(file_obj.read())
+            return { 'location': path }
     
     
 def get_dir(machine_name, path):
