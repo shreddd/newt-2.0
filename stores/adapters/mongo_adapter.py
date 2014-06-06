@@ -1,4 +1,21 @@
-"""
+"""Mongo Adapter for NEWT 
+
+Structure:
+    - Database Name: stores
+    - Each new store is a new collection in the database 
+    - Each object in the collection is stored as:
+        {
+            "_id": Mongo ObjectId
+            "oid": Id of the object stored (str)
+            "data": The object data
+        }
+    - Permissions (?) are stored in the 'permissions' collection as:
+        {
+            "name": Name of the store 
+            "groups": Groups associated with the store 
+            "owner": Owner of the store
+            "users": Users with access to the store (?)
+        }
 
 """
 from pymongo import MongoClient
@@ -73,7 +90,9 @@ def get_store_perms(store_name):
     store_name -- the name of the store
     """
     # Return the permissions of the store
-    pass
+    db = MongoClient()['stores']
+    store = db["permissions"]
+    return store.find_one({"name":store_name}, {"_id":0, "groups":1, "users":1})
 
 def update_store_perms(store_name, perms):
     """Updates the permissions of the given store with perms
