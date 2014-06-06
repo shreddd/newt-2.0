@@ -12,6 +12,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
+        'TEST_NAME': 'test_sqlite.db',
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'newtdb.sqlite',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
@@ -132,6 +133,7 @@ INSTALLED_APPS = (
     'auth',
     'status',
     'file',
+    'stores',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -213,6 +215,7 @@ NEWT_CONFIG = {
         'FILE': 'file.adapters.localfile_adapter',
         'AUTH': 'auth.adapters.dbauth_adapter',
         'COMMAND': 'command.adapters.exec_adapter',
+        'STORES': 'stores.adapters.mongo_adapter',
 
 
     }

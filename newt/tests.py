@@ -8,6 +8,7 @@ from django.conf import settings
 import socket
 import requests
 import os
+import json
 
 newt_base_url = "http://127.0.0.1:8000/api"
 
@@ -178,3 +179,73 @@ class AuthTests(TestCase):
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['auth'], False)
+
+class StoresTests(TestCase):
+    # Assumes that the stores database is empty
+    def test_stores_basic(self):
+        r = requests.get(newt_base_url + "/stores")
+        self.assertEquals(r.status_code, 200)
+
+    def test_stores_creation(self):
+        # Creates a new store
+        r = requests.post(newt_base_url + "/stores")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        store_id = json_response['output']['id']
+        
+        # Ensures that new store is empty
+        r = requests.get(newt_base_url + "/stores/" + store_id + "/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'], [])
+        
+        # Tests insertion
+        payload = {"data": json.dumps({"foo":"bar"})}
+        r = requests.post(newt_base_url + "/stores/" + store_id + "/",
+                          data=payload)
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        obj_id = json_response['output']['id']
+        # Checks insertion by checking all of the store's objects
+        r = requests.get(newt_base_url + "/stores/" + store_id + "/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'][0], payload['data'])
+        # Checks insertion by checking the individual object
+        r = requests.get(newt_base_url + "/stores/" + store_id + "/" + obj_id + "/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'], payload['data'])
+        
+        # Tests update
+        updated_payload = {"data": json.dumps({"foo": "baz"})}
+        r = requests.put(newt_base_url + "/stores/" + store_id + "/" + obj_id + "/",
+                         data=updated_payload)
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'], updated_payload['data'])
+
+        # Tests delete
+        r = requests.delete(newt_base_url + "/stores/" + store_id + "/")
+        self.assertEquals(r.status_code, 200)
+
+    def test_stores_creation_with_initial(self):
+        payload = {"data": json.dumps({"x":5})}
+
+        # Without an initial name
+        r = requests.post(newt_base_url + "/stores", data=payload)
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        store_id = json_response['output']['id']
+        self.assertEquals(json_response['output']['oid'][0], 0)
+
+        # With an initial name
+        r = requests.post(newt_base_url + "/stores/teststore1/", data=payload)
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output']['id'], "teststore1")
+
+        r = requests.delete(newt_base_url + "/stores/teststore1/")
+        self.assertEquals(r.status_code, 200)
+        r = requests.delete(newt_base_url + "/stores/" + store_id + "/")
+        self.assertEquals(r.status_code, 200)
