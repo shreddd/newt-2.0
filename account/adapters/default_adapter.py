@@ -32,7 +32,7 @@ def get_group_info(group_name, gid):
         else:
             raise Exception()
         group_dict = model_to_dict(group)
-        group_dict['users'] = [u.username for u in group.user_set.all()]
+        group_dict['users'] = [{"id": u.id, "username": u.username} for u in group.user_set.all()]
         return group_dict
     except Exception:
         if group_name:
