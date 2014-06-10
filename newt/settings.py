@@ -217,7 +217,7 @@ NEWT_CONFIG = {
         'AUTH': 'auth.adapters.dbauth_adapter',
         'COMMAND': 'command.adapters.exec_adapter',
         'STORES': 'stores.adapters.mongo_adapter',
-        'ACCOUNT': 'account.adapters.nersc_adapter',
+        'ACCOUNT': 'account.adapters.default_adapter',
 
 
     },
