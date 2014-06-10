@@ -16,10 +16,7 @@ class StoresRootView(JSONRestView):
         return store_adapter.get_stores()
 
     def post(self, request):
-        # Temporary: creates a store with a random name
-
-        # TODO: create a store with a given name
-
+        # Temporary: creates a store with a random name if no name is specified
         import uuid
         import random
         import string
@@ -27,8 +24,6 @@ class StoresRootView(JSONRestView):
         rand_key = random.choice(string.ascii_letters) + str(uuid.uuid4())[0:8]
         while(rand_key in store_adapter.get_stores()):
             rand_key = str(uuid.uuid4())[0:8]
-
-        # TODO: parse post body for initial datas
 
         if request.POST.get("data", False):
             return store_adapter.create_store(rand_key, [request.POST.get("data")])
@@ -67,6 +62,7 @@ class StoresView(JSONRestView):
 
     def delete(self, request, store_name):
         return store_adapter.delete_store(store_name)
+
 
 class StoresObjView(JSONRestView):
     def get(self, request, store_name, obj_id):
