@@ -249,3 +249,31 @@ class StoresTests(TestCase):
         self.assertEquals(r.status_code, 200)
         r = requests.delete(newt_base_url + "/stores/" + store_id + "/")
         self.assertEquals(r.status_code, 200)
+
+class AcctTests(TestCase):
+    def test_info_ret(self):
+        r = requests.get(newt_base_url + "/account/usage/user/tsun/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'][0]['uname'], 'tsun')
+
+        r = requests.get(newt_base_url + "/account/user/tsun/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'][0]['uname'], 'tsun')
+
+        r = requests.get(newt_base_url + "/account/group/id/1/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'][0]['group_id'], 10966)
+
+    def test_img_ret(self):
+        r = requests.get(newt_base_url + "/account/image/id/1/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'][0]['image_id'], 1)
+
+        r = requests.get(newt_base_url + "/account/image/lbl1.gif/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output'][0]['image_id'], 6)
