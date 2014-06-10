@@ -26,9 +26,9 @@ class StoresRootView(JSONRestView):
             rand_key = str(uuid.uuid4())[0:8]
 
         if request.POST.get("data", False):
-            return store_adapter.create_store(rand_key, [request.POST.get("data")])
+            return store_adapter.create_store(request, rand_key, [request.POST.get("data")])
         else:
-            return store_adapter.create_store(rand_key)
+            return store_adapter.create_store(request, rand_key)
 
 
 class StoresView(JSONRestView):
@@ -52,9 +52,9 @@ class StoresView(JSONRestView):
                 return json_response(status="ERROR", status_code=500, error="No data recieved.")
         else:
             if request.POST.get("data", False):
-                return store_adapter.create_store(store_name, [request.POST.get("data")])
+                return store_adapter.create_store(request, store_name, [request.POST.get("data")])
             else:
-                return store_adapter.create_store(store_name)
+                return store_adapter.create_store(request, store_name)
 
     def put(self, request, store_name):
         data = json.loads(request.read())
@@ -62,6 +62,14 @@ class StoresView(JSONRestView):
 
     def delete(self, request, store_name):
         return store_adapter.delete_store(store_name)
+
+class StoresPermView(JSONRestView):
+    def get(self, request, store_name):
+        return store_adapter.get_store_perms(store_name)
+
+    def post(self, request, store_name):
+        new_perms = json.loads(request.POST['data'])
+        return store_adapter.update_store_perms(store_name, new_perms)
 
 
 class StoresObjView(JSONRestView):
