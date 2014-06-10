@@ -14,17 +14,23 @@ Structure:
             "name": Name of the store 
             "groups": Groups associated with the store 
             "owner": Owner of the store
-            "users": Users with access to the store (?)
+            "users": Users with access to the store as:
+                {
+                    "name": ...
+                    "perms": ['r', 'w', ... ]
+                }
         }
 
 """
 from pymongo import MongoClient
+from common.response import json_response
+
 def get_stores():
     """Returns a list of available stores"""
     db = MongoClient()['stores']
     return filter(lambda s: s!="system.indexes", db.collection_names())
 
-def create_store(store_name, initial_data=[]):
+def create_store(request, store_name, initial_data=[]):
     """Creates a store with the given store_name and initial_data
 
     Keyword arguments:
@@ -41,6 +47,17 @@ def create_store(store_name, initial_data=[]):
     for oid, data in enumerate(initial_data):
         new_collection.insert({"oid": str(oid), "data": data})
         oid_list.append(oid)
+    # Add entry to permissions
+    perms = db['permissions']
+    perms.insert({
+        "name": store_name,
+        "groups": [],
+        "owner": request.user.username,
+        "users": [{
+            "name": request.user.username,
+            "perms": ['r', 'w'],
+        }],
+    })
     # Return the name of the store/status/objects created
     return {"id": new_collection.name, "oid": oid_list}
 
@@ -56,6 +73,8 @@ def delete_store(store_name):
     db = MongoClient()['stores']
     store = db[store_name]
     store.drop()
+    perms = db['permissions']
+    perms.find_and_modify({"name": store_name}, remove=True)
     return {"dropped": store_name}
 
 def get_store_contents(store_name):
@@ -92,7 +111,11 @@ def get_store_perms(store_name):
     # Return the permissions of the store
     db = MongoClient()['stores']
     store = db["permissions"]
-    return store.find_one({"name":store_name}, {"_id":0, "groups":1, "users":1})
+    res = store.find_one({"name":store_name}, {"_id":0})
+    if res:
+        return res
+    else:
+        return json_response(status="ERROR", status_code="404", error="Store not found")
 
 def update_store_perms(store_name, perms):
     """Updates the permissions of the given store with perms
@@ -100,10 +123,23 @@ def update_store_perms(store_name, perms):
     Keyword arguments:
     store_name -- the name of the store
     perms -- dictionary of the updated permissions
+            [
+                {
+                    "name": ..., 
+                    "perms": [...]
+                }, 
+                ... 
+            ]
     """
     # Updates the permissions of the store and returns the status
-    pass
-
+    db = MongoClient()['stores']
+    perm_col = db['permissions']
+    for new_perm in perms:
+        # Remove original permission
+        perm_col.update({"name": store_name}, {"$pull": {"users": {"name": new_perm['name']}}})
+        # Insert new permission
+        perm_col.update({"name": store_name}, {"$addToSet":{"users": new_perm}})
+    return {"id": store_name}
 def store_insert(store_name, data):
     """Inserts data into the store
 

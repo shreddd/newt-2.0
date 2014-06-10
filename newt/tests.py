@@ -181,7 +181,12 @@ class AuthTests(TestCase):
         self.assertEquals(json_response['output']['auth'], False)
 
 class StoresTests(TestCase):
-    # Assumes that the stores database is empty
+    def setUp(self):
+        from pymongo import MongoClient
+        db = MongoClient()['stores']
+        db.test_store_1.drop()
+        db.permissions.remove({"name":"test_store_1"})
+        # Assumes that the stores database is empty
     def test_stores_basic(self):
         r = requests.get(newt_base_url + "/stores")
         self.assertEquals(r.status_code, 200)
@@ -250,30 +255,57 @@ class StoresTests(TestCase):
         r = requests.delete(newt_base_url + "/stores/" + store_id + "/")
         self.assertEquals(r.status_code, 200)
 
+    def test_store_perms(self):
+        login = { 'username': "testuser", 'password': "test1pass" }
+        session = requests.Session()
+        session.post(newt_base_url + "/auth", data=login)
+
+        r = session.post(newt_base_url + "/stores/test_store_1/")
+        self.assertEquals(r.status_code, 200)
+        r = session.get(newt_base_url + "/stores/test_store_1/perms/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output']['name'], "test_store_1")
+        self.assertEquals(json_response['output']['users'][0]['name'], "testuser")
+
+        payload = {"data": json.dumps([{"name": "tsun", "perms": ["r"]}])}
+        r = session.post(newt_base_url + "/stores/test_store_1/perms/", data=payload)
+        self.assertEqual(r.status_code, 200)
+
+        r = session.get(newt_base_url + "/stores/test_store_1/perms/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output']['name'], "test_store_1")
+        self.assertEquals(json_response['output']['users'][1]['name'], "tsun")
+        self.assertEquals(json_response['output']['users'][1]['perms'], ['r'])
+
+        payload = {"data": json.dumps([{"name": "tsun", "perms": ["r", "w"]}])}
+        r = session.post(newt_base_url + "/stores/test_store_1/perms/", data=payload)
+
+        r = session.get(newt_base_url + "/stores/test_store_1/perms/")
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output']['name'], "test_store_1")
+        self.assertEquals(json_response['output']['users'][1]['name'], "tsun")
+        self.assertEquals(json_response['output']['users'][1]['perms'], ['r', 'w'])
+
+        session.delete(newt_base_url + "/stores/test_store_1/")
+        r = session.get(newt_base_url + "/stores/test_store_1/perms/")
+        self.assertEquals(r.status_code, 404)
+
 class AcctTests(TestCase):
     def test_info_ret(self):
-        r = requests.get(newt_base_url + "/account/usage/user/tsun/")
+        r = requests.get(newt_base_url + "/account/user/testuser/")
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
-        self.assertEquals(json_response['output'][0]['uname'], 'tsun')
+        self.assertEquals(json_response['output']['username'], 'testuser')
 
-        r = requests.get(newt_base_url + "/account/user/tsun/")
+        r = requests.get(newt_base_url + "/account/user/id/2/")
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
-        self.assertEquals(json_response['output'][0]['uname'], 'tsun')
+        self.assertEquals(json_response['output']['username'], 'testuser')
 
         r = requests.get(newt_base_url + "/account/group/id/1/")
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
-        self.assertEquals(json_response['output'][0]['group_id'], 10966)
-
-    def test_img_ret(self):
-        r = requests.get(newt_base_url + "/account/image/id/1/")
-        self.assertEquals(r.status_code, 200)
-        json_response = r.json()
-        self.assertEquals(json_response['output'][0]['image_id'], 1)
-
-        r = requests.get(newt_base_url + "/account/image/lbl1.gif/")
-        self.assertEquals(r.status_code, 200)
-        json_response = r.json()
-        self.assertEquals(json_response['output'][0]['image_id'], 6)
+        self.assertEquals(json_response['output']['name'], "Test Group")
