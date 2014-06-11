@@ -181,6 +181,7 @@ PROJECT_DIR = os.path.dirname(os.path.dirname(__file__))
 NEWT_VERSION = '0.5.0'
 NEWT_HOST = 'localhost'
 NEWT_DOMAIN = 'nersc.gov'
+NEWT_COOKIE_LIFETIME=43200
 MYPROXY_SERVER = 'nerscca2.nersc.gov'
 
 

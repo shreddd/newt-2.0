@@ -206,10 +206,11 @@ def myproxy_logon(hostname,username,passphrase,outfile,lifetime=43200,port=7512)
 
 
 class Cred:
-    def __init__(self, cert, key, calist=None):
+    def __init__(self, cert, key, user, calist=None):
         self.cert = cert
         self.key = key
         self.calist = calist
+        self.user = user
   
     def __unicode__(self):
         return self.cert
