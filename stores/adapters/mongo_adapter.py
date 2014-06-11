@@ -24,20 +24,35 @@ Structure:
 """
 from pymongo import MongoClient
 from common.response import json_response
+import json
+import uuid
+import random
+import string
+from django.http import QueryDict
 
 def get_stores():
     """Returns a list of available stores"""
     db = MongoClient()['stores']
     return filter(lambda s: s!="system.indexes", db.collection_names())
 
-def create_store(request, store_name, initial_data=[]):
+def create_store(request, store_name):
     """Creates a store with the given store_name and initial_data
 
     Keyword arguments:
+    request -- request the data can be derived from
     store_name -- the name of the store
-    initial_data -- initial data for the store (optional)
     """
     # Check that store name is unique (or create unique identifier)
+    if not store_name:
+        store_name = random.choice(string.ascii_letters) + str(uuid.uuid4())[0:8]
+        while(store_name in get_stores()):
+            store_name = str(uuid.uuid4())[0:8]
+    elif store_name in get_stores():
+        return json_response(status="ERROR", status_code=400, error="Store name already exists.")
+    
+    # Loads the initial data if it exists
+    initial_data = json.loads(request.POST.get("data", "[]"))
+
     # Create new collection
     db = MongoClient()['stores']
     new_collection = db.create_collection(store_name)
@@ -83,9 +98,14 @@ def get_store_contents(store_name):
     Keyword arguments:
     store_name -- the name of the store
     """
-    # Check privlages of user attempting to access store
+    # Check existance of the store
     if store_name not in get_stores():
-        raise Exception('The store \"' + store_name + '\" does not exist.')
+        return json_response(status="ERROR", 
+                             status_code=404, 
+                             error="Store does not exist: %s" % store_name)
+
+    # Check privlages of user attempting to access store
+
     # Get and return contents of the store
     db = MongoClient()['stores']
     store = db[store_name]
@@ -117,7 +137,7 @@ def get_store_perms(store_name):
     else:
         return json_response(status="ERROR", status_code="404", error="Store not found")
 
-def update_store_perms(store_name, perms):
+def update_store_perms(request, store_name):
     """Updates the permissions of the given store with perms
 
     Keyword arguments:
@@ -131,22 +151,33 @@ def update_store_perms(store_name, perms):
                 ... 
             ]
     """
+    # Gets updated permissions from the request
+    perms = request.POST.get("data", None)
+    if not perms:
+        return json_response(status="ERROR", status_code=400, error="No data received.")
+
     # Updates the permissions of the store and returns the status
     db = MongoClient()['stores']
     perm_col = db['permissions']
-    for new_perm in perms:
+    for new_perm in json.loads(perms):
         # Remove original permission
         perm_col.update({"name": store_name}, {"$pull": {"users": {"name": new_perm['name']}}})
         # Insert new permission
         perm_col.update({"name": store_name}, {"$addToSet":{"users": new_perm}})
     return {"id": store_name}
-def store_insert(store_name, data):
+
+def store_insert(request, store_name):
     """Inserts data into the store
 
     Keyword arguments:
     store_name -- the name of the store
     data -- a list of key value pairs to be put in the store
     """
+    # Get the data
+    data = request.POST.get("data", None)
+    if not data:
+        return json_response(status="ERROR", status_code=400, error="No data received.")
+
     # Insert the key value pairs into the store
     db = MongoClient()['stores']
     store = db[store_name]
@@ -154,13 +185,18 @@ def store_insert(store_name, data):
     store.insert({"oid": oid, "data": data})
     return {"id": oid}
 
-def store_update(store_name, obj_id, data):
+def store_update(request, store_name, obj_id):
     """Updates a certain key-value pair in the store
 
     Keyword arguments:
     store_name -- the name of the store
     pair -- the updated pair (dict)
     """
+    # Get data from PUT request
+    data = QueryDict(request.body).get("data", None)
+    if not data:
+        return json_response(status="ERROR", status_code=400, error="No data received.")
+
     # Set the key of the store to the new value
     db = MongoClient()['stores']
     store = db[store_name]
@@ -181,5 +217,8 @@ def store_get_obj(store_name, obj_id):
     if obj:
         return obj['data']
     else:
-        raise Exception("Invalid object id: " + obj_id)
+        return json_response(status="ERROR",
+                             status_code=400,
+                             error="Object not found: %s - Object %s" 
+                                    % (store_name, obj_id))
 
