@@ -12,7 +12,7 @@ def ping(machine_name, hostname):
     else:
         return {'system': machine_name, 'status': 'down'}
 
-def get(machine_name=None):
+def get_status(machine_name=None):
     conf = settings.NEWT_CONFIG
 
     if machine_name == None:

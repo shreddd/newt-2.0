@@ -15,4 +15,4 @@ logger = logging.getLogger(__name__)
 class StatusView(JSONRestView):
     def get(self, request, machine_name=None):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
-        return adapter.get(machine_name)
+        return adapter.get_status(machine_name)

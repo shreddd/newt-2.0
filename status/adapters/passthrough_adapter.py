@@ -3,7 +3,7 @@ from django.conf import settings
 import requests
 from common.response import json_response
 
-def get(machine_name=None):
+def get_status(machine_name=None):
     base_url = settings.STATUS_URL
     if machine_name==None:
         url = base_url
