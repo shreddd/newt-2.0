@@ -10,6 +10,10 @@ def get(machine_name=None):
         url = '%s?%s=%s' % (base_url, 'system', machine_name)
     
     r = requests.get(url)
-    
-    return r.json()
+    data = r.json()
+    if data['status'] == "unknown":
+        return json_response(status="ERROR", 
+                             status_code=400, 
+                             error="Unrecognized system: %s" % machine_name))
+    return data
 

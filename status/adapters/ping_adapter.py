@@ -11,8 +11,6 @@ def ping(machine_name, hostname):
     else:
         return {'system': machine_name, 'status': 'down'}
 
-
-
 def get(machine_name=None):
     conf = settings.NEWT_CONFIG
 
@@ -27,7 +25,8 @@ def get(machine_name=None):
                 break
 
         if hostname is None:
-            raise ValueError("unrecognized system %s" % machine_name)
-
+            return json_response(status="ERROR", 
+                                 status_code=404, 
+                                 error="Unrecognized system: %s" % machine_name)
         return ping(machine_name, hostname)
 
