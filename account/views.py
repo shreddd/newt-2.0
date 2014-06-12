@@ -15,7 +15,4 @@ class GroupInfoView(JSONRestView):
 
 class OtherInfoView(JSONRestView):
     def get(self, request, query):
-        return json_response(status="Unimplemented", 
-                             status_code=501, 
-                             error="", 
-                             content="query: %s" % query)
+        return acct_adapter.info_router(request, query)
