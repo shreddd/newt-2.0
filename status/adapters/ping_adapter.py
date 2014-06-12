@@ -1,6 +1,7 @@
 # Ping Status Adapter
 from django.conf import settings
 import os
+from common.response import json_response
 
 
 def ping(machine_name, hostname):

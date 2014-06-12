@@ -1,6 +1,7 @@
 # Passthrough Adapter
 from django.conf import settings
 import requests
+from common.response import json_response
 
 def get(machine_name=None):
     base_url = settings.STATUS_URL
