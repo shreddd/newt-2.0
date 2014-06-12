@@ -2,8 +2,16 @@
 from django.conf import settings
 import requests
 from common.response import json_response
+import logging
+logger = logging.getLogger(__name__)
 
 def get_status(machine_name=None):
+    """ Returns the status of a given machine (if machine_name is set),
+        otherwise the statuses of all the machines
+
+    Keyword arguments
+    machine_name -- (optional) name of the machine
+    """
     base_url = settings.STATUS_URL
     if machine_name==None:
         url = base_url

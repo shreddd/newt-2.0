@@ -12,6 +12,8 @@ Notes:
         - error: string with the error message if there is one 
 """
 from common.response import json_response
+import logging
+logger = logging.getLogger(__name__)
 
 def get_status(machine_name=None):
     """ Returns the status of a given machine (if machine_name is set),

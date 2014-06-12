@@ -2,6 +2,8 @@
 from django.conf import settings
 import os
 from common.response import json_response
+import logging
+logger = logging.getLogger(__name__)
 
 
 def ping(machine_name, hostname):
@@ -13,6 +15,12 @@ def ping(machine_name, hostname):
         return {'system': machine_name, 'status': 'down'}
 
 def get_status(machine_name=None):
+    """ Returns the status of a given machine (if machine_name is set),
+        otherwise the statuses of all the machines
+
+    Keyword arguments
+    machine_name -- (optional) name of the machine
+    """
     conf = settings.NEWT_CONFIG
 
     if machine_name == None:

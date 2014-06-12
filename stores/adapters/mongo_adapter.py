@@ -25,10 +25,10 @@ Structure:
 from pymongo import MongoClient
 from common.response import json_response
 import json
-import uuid
-import random
-import string
+import uuid, random, string
 from django.http import QueryDict
+import logging
+logger = logging.getLogger(__name__)
 
 def get_stores():
     """Returns a list of available stores"""

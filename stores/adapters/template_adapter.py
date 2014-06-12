@@ -12,6 +12,8 @@ Notes:
         - error: string with the error message if there is one 
 """
 from common.response import json_response
+import logging
+logger = logging.getLogger(__name__)
 
 def get_stores():
     """Returns a list of available stores"""
