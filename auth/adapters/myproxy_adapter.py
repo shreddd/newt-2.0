@@ -1,6 +1,16 @@
+from common.response import json_response
+import logging
+logger = logging.getLogger(__name__)
+from auth.adapters.myproxy_backend import MyProxyBackend
 from django.contrib import auth
 
-def is_logged_in(request):
+
+def get_status(request):
+    """Returns the current user status
+
+    Keyword arguments:
+    request -- Django HttpRequest
+    """
     if (request.user is not None) and (request.user.is_authenticated()):
         output=dict(auth=True,
                     username=request.user.username,
@@ -14,21 +24,26 @@ def is_logged_in(request):
     return output
 
 
-def get_status(request):
-    return is_logged_in(request)
-
-
 def login(request):
+    """Logs the user in and returns the status
 
+    Keyword arguments:
+    request -- Django HttpRequest
+    """
+    mpb = MyProxyBackend()
     username = request.POST['username']
     password = request.POST['password']
-    user = auth.authenticate(username=username, password=password)
+    user = mpb.authenticate(username=username, password=password)
     if user is not None:
         auth.login(request, user)
+    return get_status(request)
 
-    return is_logged_in(request)
 
 def logout(request):
-    auth.logout(request)
+    """Logs the user out and returns the status
 
-    return is_logged_in(request)
+    Keyword arguments:
+    request -- Django HttpRequest
+    """
+    auth.logout(request)
+    return get_status(request)

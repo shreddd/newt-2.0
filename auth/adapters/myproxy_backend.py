@@ -249,6 +249,7 @@ class MyProxyBackend:
         # If we have a request object save the credential in the session
         if request:
             request.session.__setitem__("cred", mycred)
+        myuser.backend = 'django.contrib.auth.backends.ModelBackend'
         return myuser
   
     def get_user(self, user_id):
