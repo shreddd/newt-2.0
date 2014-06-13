@@ -64,7 +64,11 @@ class StatusTests(TestCase):
         json_response = r.json()
         self.assertEquals(json_response['status'], "OK")
 
-        self.assertEquals(json_response['output'][0]['status'], 'up')
+        for x in json_response['output']:
+            if x['system'] == "localhost":
+                self.assertEquals(x['status'], 'up')
+            else:
+                self.assertIn(x['status'], ['up', 'down'])
 
     def test_one(self):
         system = settings.NEWT_CONFIG['SYSTEMS'][0]['NAME']
