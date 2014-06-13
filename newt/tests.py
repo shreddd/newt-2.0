@@ -10,7 +10,7 @@ import socket
 import os
 import json
 
-newt_base_url = "http://127.0.0.1:8000/api"
+newt_base_url = "/api"
 
 class MyTestClient(Client):
     def request(self, **request):
