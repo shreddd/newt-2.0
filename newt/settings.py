@@ -220,8 +220,6 @@ NEWT_CONFIG = {
         'COMMAND': 'command.adapters.exec_adapter',
         'STORES': 'stores.adapters.mongo_adapter',
         'ACCOUNT': 'account.adapters.django_adapter',
-
-
     },
     'NIM_BASE_URL': 'http://nimprod.nersc.gov:8004',
 

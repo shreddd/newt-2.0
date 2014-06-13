@@ -189,11 +189,12 @@ def store_update(request, store_name, obj_id):
     """Updates a certain key-value pair in the store
 
     Keyword arguments:
+    request -- Django HttpRequest object
     store_name -- the name of the store
-    pair -- the updated pair (dict)
+    obj_id -- ID of the object in the store
     """
     # Get data from PUT request
-    data = QueryDict(request.body).get("data", None)
+    data = json.loads(request.body).get("data", None)
     if not data:
         return json_response(status="ERROR", status_code=400, error="No data received.")
 

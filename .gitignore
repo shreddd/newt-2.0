@@ -1,2 +1,4 @@
 *.pyc
 *sqlite
+.DS_Store
+venv
