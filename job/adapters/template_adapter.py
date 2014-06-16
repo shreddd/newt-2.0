@@ -16,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_queues(request):
+def get_queues():
     """Returns the available queues that jobs can run on
 
     Keyword arguments:

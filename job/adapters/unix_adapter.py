@@ -9,7 +9,7 @@ from django.conf import settings
 import datetime
 import pytz
 
-def get_queues(request):
+def get_queues():
     """Returns the available queues that jobs can run on
 
     Keyword arguments:
@@ -39,6 +39,7 @@ def submit_job(request, machine_name):
     request -- Django HttpRequest
     machine_name -- name of the machine
     """
+    # Get data from POST
     if request.POST.get("jobfile", False):
         try:
             f = open(request.POST.get("jobfile"), 'r')
@@ -55,9 +56,17 @@ def submit_job(request, machine_name):
         return json_response(status="ERROR", 
                              status_code=400, 
                              error="No data received")
+
+    # Generate unique outfile name
     tmp_job_name = str(ObjectId()) + ".out"
+
+    # Get job emulator path
     job_emu = settings.PROJECT_DIR + "/job/adapters/emulate_job_run.sh"
+
+    # Run job with the commands in data
     job = Popen([job_emu, tmp_job_name, data], stdout=PIPE)
+
+    # Get/return the job_id from stdout
     job_id = job.stdout.readline().rstrip()
     return {"jobid": job_id}    
 
