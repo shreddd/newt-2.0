@@ -355,6 +355,10 @@ class JobTests(TestCase):
         self.client = MyTestClient()
 
     def test_running_cmds(self):
+        # Tests getting queues
+        r = self.client.get(newt_base_url + "/queue/")
+        self.assertEquals(r.status_code, 200)
+
         # Tests submitting a job
         payload = {
             "jobscript": "sleep 5\nls ~"
