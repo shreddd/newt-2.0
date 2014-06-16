@@ -16,6 +16,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def get_queues(request):
+    """Returns the available queues that jobs can run on
+
+    Keyword arguments:
+    request - Django HttpRequest
+    """
+    pass
+
+
 def view_queue(request, machine_name):
     """Returns the current state of the queue in a list
 
