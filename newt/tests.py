@@ -211,10 +211,13 @@ class StoresTests(TestCase):
 
     def setUp(self):
         self.client = MyTestClient()
-        from pymongo import MongoClient
-        db = MongoClient()['stores']
-        db.test_store_1.drop()
-        db.permissions.remove({"name":"test_store_1"})
+        try:
+            from pymongo import MongoClient
+            db = MongoClient()['stores']
+            db.test_store_1.drop()
+            db.permissions.remove({"name":"test_store_1"})
+        except Exception:
+            pass
         # Assumes that the stores database is empty
     def test_stores_basic(self):
         r = self.client.get(newt_base_url + "/stores")
@@ -344,3 +347,30 @@ class AcctTests(TestCase):
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['name'], "Test Group")
+
+
+class JobTests(TestCase):
+
+    def setUp(self):
+        self.client = MyTestClient()
+
+    def test_running_cmds(self):
+        # Tests submitting a job
+        payload = {
+            "jobscript": "sleep 5\nls ~"
+        }
+        r = self.client.post(newt_base_url + "/queue/localhost/", data=payload)
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertIsNot(json_response['output']['jobid'], None)
+        job_id = json_response['output']['jobid']
+
+        # Tests getting job info
+        r = self.client.get(newt_base_url + "/queue/localhost/%s/" % job_id)
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output']['jobid'], job_id)
+
+        # Delete job from queue
+        r = self.client.delete(newt_base_url + "/queue/localhost/%s/" % job_id)
+        self.assertEquals(r.status_code, 200)
