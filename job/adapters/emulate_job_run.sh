@@ -12,6 +12,7 @@ tmpfile=$1
 cmd=$2
 
 # Run the command
+touch "/tmp/newt_processes/$tmpfile"
 eval "$cmd > /tmp/newt_processes/$tmpfile"&
 
 process_pid=$!
@@ -22,7 +23,6 @@ time_start=`date -u +%s`
 while ps -p $process_pid >> /dev/null
 do
     echo "$process_pid; 999; $time_start; " > "/tmp/newt_processes/$process_pid.log"
-    # Place started timestamp
     sleep 3
 done
 

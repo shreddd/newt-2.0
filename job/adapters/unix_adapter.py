@@ -3,6 +3,14 @@ import logging
 logger = logging.getLogger(__name__)
 from common.shell import run_command
 import re
+from bson.objectid import ObjectId
+from subprocess import Popen, PIPE
+from django.conf import settings
+import datetime
+import pytz
+
+def get_queues(request):
+    return ['localhost']
 
 
 def view_queue(request, machine_name):
@@ -26,7 +34,27 @@ def submit_job(request, machine_name):
     request -- Django HttpRequest
     machine_name -- name of the machine
     """
-    pass
+    if request.POST.get("jobfile", False):
+        try:
+            f = open(request.POST.get("jobfile"), 'r')
+            data = f.read()
+        except Exception as e:
+            return json_response(status="ERROR", 
+                                 status_code=400, 
+                                 error="Unable to open job file. Be sure you gave an absolute path.")
+        finally:
+            f.close()
+    elif request.POST.get("jobscript", False):
+        data = request.POST.get("jobscript")
+    else:
+        return json_response(status="ERROR", 
+                             status_code=400, 
+                             error="No data received")
+    tmp_job_name = str(ObjectId()) + ".out"
+    job_emu = settings.PROJECT_DIR + "/job/adapters/emulate_job_run.sh"
+    job = Popen([job_emu, tmp_job_name, data], stdout=PIPE)
+    job_id = job.stdout.readline().rstrip()
+    return {"jobid": job_id}    
 
 
 def get_info(machine_name, job_id):
@@ -36,9 +64,35 @@ def get_info(machine_name, job_id):
     machine_name -- name of the machine
     job_id -- the job id
     """
-    (output, error, retcode) = run_command("ps aux %d" % job_id)
-    patt = re.compile(r'(?P<user>[^\s]+)\s+(?P<jobid>\d+)\s+(?P<cpu>[\d\.]+)\s+(?P<mem>[\d\.]+)\s+(?P<vsz>\d+)\s+(?P<rss>\d+)\s+(?P<tt>[^\s]+)\s+(?P<stat>[^\s]+)\s+(?P<started>[^\s]+)\s+(?P<timeuse>[^\s]+)\s+(?P<command>.+)')
-    info = patt.match(output.splitlines()[1]).groupdict()
+    try:
+        job_out = open("/tmp/newt_processes/%s.log" % job_id, 'r')
+        lines = job_out.read().splitlines()
+        job_out.close()
+    except Exception as e:
+        return {
+            "jobid": job_id,
+            "status": "queue",
+            "time_start": "",
+            "time_end": "",
+            "time_used": "",
+            "output": ""
+        }
+    output = "\n".join(lines[1:])
+    info = lines[0].split("; ")
+    time_start = datetime.datetime.fromtimestamp(float(info[2]), tz=pytz.timezone("utc"))
+    time_end = "" if info[1] == "999" else datetime.datetime.fromtimestamp(float(info[3]), tz=pytz.timezone("utc"))
+    if info[1] == "999":
+        time_used = datetime.utcnow() - time_start
+    else:
+        time_used = time_end - time_start
+    info = {
+        "jobid": info[0],
+        "status": "running" if info[1] == "999" else info[1],
+        "time_start": str(time_start),
+        "time_end": str(time_end),
+        "time_used": str(time_end),
+        "output": output
+    }
     return info    
 
 
@@ -49,7 +103,7 @@ def delete_job(machine_name, job_id):
     machine_name -- name of the machine
     job_id -- the job id
     """
-    (output, error, retcode) = run_command("kill %d" % job_id)
+    (output, error, retcode) = run_command("kill %s" % job_id)
     if retcode != 0:
         return json_response(status="ERROR",
                              status_code=500,
