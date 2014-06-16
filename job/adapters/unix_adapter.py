@@ -10,6 +10,11 @@ import datetime
 import pytz
 
 def get_queues(request):
+    """Returns the available queues that jobs can run on
+
+    Keyword arguments:
+    request - Django HttpRequest
+    """
     return ['localhost']
 
 
