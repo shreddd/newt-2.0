@@ -4,7 +4,8 @@ from common.response import json_response
 from django.http import HttpResponseServerError
 from django.conf import settings
 
-adapter = __import__(settings.NEWT_CONFIG['ADAPTERS']['STATUS'], globals(), locals(), ['adapter'], -1)
+from importlib import import_module
+adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['STATUS']['adapter'])
 
 import logging
 

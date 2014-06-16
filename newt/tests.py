@@ -9,8 +9,10 @@ from django.test.client import Client
 import socket
 import os
 import json
+import time
 
 newt_base_url = "/api"
+login = {"username": "nimonly", "password": "Jst4$Nim"}
 
 class MyTestClient(Client):
     def request(self, **request):
@@ -161,7 +163,6 @@ class FileTests(TestCase):
 
 class AuthTests(TestCase):
     fixtures = ["test_fixture.json"]
-    payload = { 'username': "testuser", 'password': "test1pass" }
 
     def setUp(self):
         self.client = MyTestClient()
@@ -174,27 +175,27 @@ class AuthTests(TestCase):
         self.assertEquals(json_response['output']['auth'], False)
         
         # Should be logged in
-        r = self.client.post(newt_base_url + "/auth", data=self.payload)
+        r = self.client.post(newt_base_url + "/auth", data=login)
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['auth'], True)
-        self.assertEquals(json_response['output']['username'], self.payload['username'])
+        self.assertEquals(json_response['output']['username'], login['username'])
 
         # Loggen in self.client should return user info
         r = self.client.get(newt_base_url + "/auth")
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['auth'], True)
-        self.assertEquals(json_response['output']['username'], self.payload['username'])
+        self.assertEquals(json_response['output']['username'], login['username'])
 
 
     def test_logout(self):
         # Should be logged in
-        r = self.client.post(newt_base_url + "/auth", data=self.payload)
+        r = self.client.post(newt_base_url + "/auth", data=login)
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['auth'], True)
-        self.assertEquals(json_response['output']['username'], self.payload['username'])
+        self.assertEquals(json_response['output']['username'], login['username'])
 
         r = self.client.delete(newt_base_url + "/auth")
         self.assertEquals(r.status_code, 200)
@@ -289,8 +290,6 @@ class StoresTests(TestCase):
         self.assertEquals(r.status_code, 200)
 
     def test_store_perms(self):
-        login = { 'username': "testuser", 'password': "test1pass" }
-
         self.client.post(newt_base_url + "/auth", data=login)
 
         r = self.client.post(newt_base_url + "/stores/test_store_1/")
@@ -299,7 +298,7 @@ class StoresTests(TestCase):
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['name'], "test_store_1")
-        self.assertEquals(json_response['output']['users'][0]['name'], "testuser")
+        self.assertEquals(json_response['output']['users'][0]['name'], login['username'])
 
         payload = {"data": json.dumps([{"name": "tsun", "perms": ["r"]}])}
         r = self.client.post(newt_base_url + "/stores/test_store_1/perms/", data=payload)
@@ -350,9 +349,12 @@ class AcctTests(TestCase):
 
 
 class JobTests(TestCase):
+    fixtures = ["test_fixture.json"]
+    
 
     def setUp(self):
         self.client = MyTestClient()
+        self.client.post(newt_base_url + "/auth", data=login)
 
     def test_running_cmds(self):
         # Tests getting queues
@@ -374,7 +376,32 @@ class JobTests(TestCase):
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['jobid'], job_id)
+        self.assertEquals(json_response['output']['user'], login['username'])
 
         # Delete job from queue
         r = self.client.delete(newt_base_url + "/queue/localhost/%s/" % job_id)
         self.assertEquals(r.status_code, 200)
+
+    def test_short_cmd(self):
+        payload = {
+            "jobscript": "ls -a /"
+        }
+        r = self.client.post(newt_base_url + "/queue/localhost/", data=payload)
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertIsNot(json_response['output']['jobid'], None)
+        job_id = json_response['output']['jobid']
+
+        time.sleep(1)
+
+        r = self.client.get(newt_base_url + "/queue/localhost/%s/" % job_id)
+        self.assertEquals(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output']['jobid'], job_id)
+        self.assertEquals(json_response['output']['user'], login['username'])
+        self.assertEquals(json_response['output']['status'], '0')
+        files = ['.', '..'] + os.listdir("/")
+        files.sort()
+        cmd_out = json_response['output']['output'].splitlines()
+        self.assertEquals(files, cmd_out)
+        

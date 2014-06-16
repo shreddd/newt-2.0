@@ -12,7 +12,8 @@ fi
 
 # Get command and tempfile from input
 tmpfile=$1
-cmd=$2
+user=$2
+cmd=$3
 
 # Creates the tmpfile
 touch "/tmp/newt_processes/$tmpfile"
@@ -24,11 +25,13 @@ process_pid=$!
 
 echo $process_pid
 time_start=`date -u +%s`
+echo "$process_pid; $user; 999; $time_start; " > "/tmp/newt_processes/$process_pid.log"
+
 
 while ps -p $process_pid >> /dev/null
 do
     # Print the status to the log file as long as the PID exists in the ps command
-    echo "$process_pid; 999; $time_start; " > "/tmp/newt_processes/$process_pid.log"
+    echo "$process_pid; $user; 999; $time_start; " > "/tmp/newt_processes/$process_pid.log"
     sleep 3
 done
 
@@ -37,7 +40,7 @@ my_status=$?
 time_end=`date -u +%s`
 
 # Print the completed status to the log file
-echo "$process_pid; $my_status; $time_start; $time_end" > "/tmp/newt_processes/$process_pid.log"
+echo "$process_pid; $user; $my_status; $time_start; $time_end" > "/tmp/newt_processes/$process_pid.log"
 
 # Append the data from the command output (to the log file)
 cat "/tmp/newt_processes/$tmpfile" >> "/tmp/newt_processes/$process_pid.log"

@@ -6,7 +6,7 @@ import re
 from bson.objectid import ObjectId
 from subprocess import Popen, PIPE
 from django.conf import settings
-import datetime
+from datetime import datetime
 import pytz
 
 def get_queues():
@@ -64,7 +64,7 @@ def submit_job(request, machine_name):
     job_emu = settings.PROJECT_DIR + "/job/adapters/emulate_job_run.sh"
 
     # Run job with the commands in data
-    job = Popen([job_emu, tmp_job_name, data], stdout=PIPE)
+    job = Popen([job_emu, tmp_job_name, request.user.username, data], stdout=PIPE)
 
     # Get/return the job_id from stdout
     job_id = job.stdout.readline().rstrip()
@@ -85,6 +85,7 @@ def get_info(machine_name, job_id):
     except Exception as e:
         return {
             "jobid": job_id,
+            "user": "",
             "status": "queue",
             "time_start": "",
             "time_end": "",
@@ -93,18 +94,19 @@ def get_info(machine_name, job_id):
         }
     output = "\n".join(lines[1:])
     info = lines[0].split("; ")
-    time_start = datetime.datetime.fromtimestamp(float(info[2]), tz=pytz.timezone("utc"))
-    time_end = "" if info[1] == "999" else datetime.datetime.fromtimestamp(float(info[3]), tz=pytz.timezone("utc"))
-    if info[1] == "999":
-        time_used = datetime.utcnow() - time_start
+    time_start = datetime.fromtimestamp(float(info[3]), tz=pytz.timezone("utc"))
+    time_end = "" if info[2] == "999" else datetime.fromtimestamp(float(info[4]), tz=pytz.timezone("utc"))
+    if info[2] == "999":
+        time_used = datetime.utcnow().replace(tzinfo=pytz.timezone(("utc"))) - time_start
     else:
         time_used = time_end - time_start
     info = {
         "jobid": info[0],
-        "status": "running" if info[1] == "999" else info[1],
+        "user": info[1],
+        "status": "running" if info[2] == "999" else info[2],
         "time_start": str(time_start),
         "time_end": str(time_end),
-        "time_used": str(time_end),
+        "time_used": str(time_used),
         "output": output
     }
     return info    

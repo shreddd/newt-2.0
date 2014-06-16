@@ -2,7 +2,8 @@
 from newt.views import JSONRestView
 from django.conf import settings
 
-auth_adapter = __import__(settings.NEWT_CONFIG['ADAPTERS']['AUTH'], globals(), locals(), ['adapter'], -1)
+from importlib import import_module
+auth_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['AUTH']['adapter'])
 
 import logging
 logger = logging.getLogger(__name__)

@@ -3,7 +3,8 @@ from common.response import json_response
 from django.shortcuts import render
 from django.conf import settings
 
-acct_adapter = __import__(settings.NEWT_CONFIG['ADAPTERS']['ACCOUNT'], globals(), locals(), ['adapter'], -1)
+from importlib import import_module
+acct_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['ACCOUNT']['adapter'])
 
 class UserInfoView(JSONRestView):
     def get(self, request, user_name=None, uid=None):

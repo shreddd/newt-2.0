@@ -31,8 +31,8 @@ def login(request):
     request -- Django HttpRequest
     """
     mpb = MyProxyBackend()
-    username = request.POST['username']
-    password = request.POST['password']
+    username = request.POST['username'].encode("utf-8")
+    password = request.POST['password'].encode("utf-8")
     user = mpb.authenticate(username=username, password=password)
     if user is not None:
         auth.login(request, user)
