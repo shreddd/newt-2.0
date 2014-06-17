@@ -332,15 +332,15 @@ class AcctTests(TestCase):
         self.client = MyTestClient()
 
     def test_info_ret(self):
-        r = self.client.get(newt_base_url + "/account/user/testuser/")
+        r = self.client.get(newt_base_url + "/account/user/%s/" % login['username'])
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
-        self.assertEquals(json_response['output']['username'], 'testuser')
+        self.assertEquals(json_response['output']['username'], login['username'])
 
         r = self.client.get(newt_base_url + "/account/user/id/2/")
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
-        self.assertEquals(json_response['output']['username'], 'testuser')
+        self.assertEquals(json_response['output']['username'], login['username'])
 
         r = self.client.get(newt_base_url + "/account/group/id/1/")
         self.assertEquals(r.status_code, 200)

@@ -223,7 +223,7 @@ NEWT_CONFIG = {
             'models': [],
         }, 
         'AUTH': {
-            'adapter': 'auth.adapters.myproxy_adapter',
+            'adapter': 'auth.adapters.dbauth_adapter',
             'models': [
                 {
                     "name": "Cred",
