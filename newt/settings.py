@@ -218,7 +218,7 @@ NEWT_CONFIG = {
         'FILE': 'file.adapters.localfile_adapter',
         'AUTH': 'auth.adapters.dbauth_adapter',
         'COMMAND': 'command.adapters.exec_adapter',
-        'STORES': 'stores.adapters.mongo_adapter',
+        'STORES': 'stores.adapters.redis_adapter',
         'ACCOUNT': 'account.adapters.django_adapter',
     },
     'NIM_BASE_URL': 'http://nimprod.nersc.gov:8004',
