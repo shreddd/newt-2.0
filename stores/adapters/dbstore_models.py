@@ -26,7 +26,7 @@ class Document(models.Model):
 class Permission(models.Model):
     user = models.ForeignKey(User, related_name="store_perms")
     store = models.ForeignKey(Store, related_name='perms')
-    type = models.CharField(max_length=10, default="r")
+    type = models.CharField(max_length=100, default="r")
 
     class Meta:
         app_label = 'stores'
