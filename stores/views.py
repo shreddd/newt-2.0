@@ -33,7 +33,7 @@ class StoresView(JSONRestView):
 
     def post(self, request, store_name):
 
-        if store_name in store_adapter.get_stores():
+        if store_name in store_adapter.get_stores(request):
             # Updates data if the store already exists
             initial_data = request.POST.get("data", None)
             return store_adapter.store_insert(request, store_name, initial_data=initial_data)

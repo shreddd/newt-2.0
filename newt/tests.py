@@ -238,7 +238,7 @@ class StoresTests(TestCase):
         json_response = r.json()
 
         # Ensures that no data was added to the store
-        self.assertEquals((json_response['output']['oid'], []))
+        self.assertEquals(json_response['output']['oid'], [])
         store_id = json_response['output']['id']
         
         # Ensures that new store is empty (get_store_contents)
