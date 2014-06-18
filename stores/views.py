@@ -14,44 +14,52 @@ logger = logging.getLogger(__name__)
 class StoresRootView(JSONRestView):
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
-        return store_adapter.get_stores()
+        return store_adapter.get_stores(request)
 
     def post(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
-        return store_adapter.create_store(request, "")
+        initial_data = request.POST.getlist("data")
+        return store_adapter.create_store(request, initial_data=initial_data)
 
 
 class StoresView(JSONRestView):
     def get(self, request, store_name):
         if request.GET.get("query", False):
             # Queries the store if the query parameter is set
-            return store_adapter.query_store(store_name, request.GET.get("query"))
+            return store_adapter.query_store(request, store_name, request.GET.get("query"))
         else:
             # Returns all data about the store
-            return store_adapter.get_store_contents(store_name)
+            return store_adapter.get_store_contents(request, store_name)
 
     def post(self, request, store_name):
+
         if store_name in store_adapter.get_stores():
             # Updates data if the store already exists
-            return store_adapter.store_insert(request, store_name)
+            initial_data = request.POST.get("data", None)
+            return store_adapter.store_insert(request, store_name, initial_data=initial_data)
         else:
             # Creates and adds the data if the store doesn't exist
-            return store_adapter.create_store(request, store_name)
+            initial_data = request.POST.getlist("data")
+            return store_adapter.create_store(request, store_name, initial_data=initial_data)
 
     def delete(self, request, store_name):
-        return store_adapter.delete_store(store_name)
+        return store_adapter.delete_store(request, store_name)
 
 class StoresPermView(JSONRestView):
     def get(self, request, store_name):
-        return store_adapter.get_store_perms(store_name)
+        return store_adapter.get_store_perms(request, store_name)
 
     def post(self, request, store_name):
-        return store_adapter.update_store_perms(request, store_name)
+        perms = json.loads(request.POST.get("data", "[]"))
+        return store_adapter.update_store_perms(request, store_name, perms=perms)
 
 
 class StoresObjView(JSONRestView):
     def get(self, request, store_name, obj_id):
-        return store_adapter.store_get_obj(store_name, obj_id)
+        return store_adapter.store_get_obj(request, store_name, obj_id)
 
     def put(self, request, store_name, obj_id):
-        return store_adapter.store_update(request, store_name, obj_id)
+        data = json.loads(request.body).get("data", None)
+        if not data:
+            return json_response(status="ERROR", status_code=400, error="No data received.")
+        return store_adapter.store_update(request, store_name, obj_id, data=data)
