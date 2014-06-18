@@ -241,7 +241,6 @@ class StoresTests(TestCase):
         payload = {"data": json.dumps({"foo":"bar"})}
         r = self.client.post(newt_base_url + "/stores/" + store_id + "/",
                           data=payload)
-
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         obj_id = json_response['output']['id']
@@ -260,6 +259,10 @@ class StoresTests(TestCase):
         updated_payload = {"data": json.dumps({"foo": "baz"})}
         r = self.client.put(newt_base_url + "/stores/" + store_id + "/" + obj_id + "/",
                          data=json.dumps(updated_payload), content_type="application/json")
+        self.assertEquals(r.status_code, 200)
+
+        # Checks updated data
+        r = self.client.get(newt_base_url + "/stores/" + store_id + "/" + obj_id + "/")
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output'], updated_payload['data'])
@@ -300,7 +303,7 @@ class StoresTests(TestCase):
         self.assertEquals(json_response['output']['name'], "test_store_1")
         self.assertEquals(json_response['output']['users'][0]['name'], login['username'])
 
-        payload = {"data": json.dumps([{"name": "tsun", "perms": ["r"]}])}
+        payload = {"data": json.dumps([{"name": login['username'], "perms": ["r"]}])}
         r = self.client.post(newt_base_url + "/stores/test_store_1/perms/", data=payload)
         self.assertEqual(r.status_code, 200)
 
@@ -308,18 +311,18 @@ class StoresTests(TestCase):
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['name'], "test_store_1")
-        self.assertEquals(json_response['output']['users'][1]['name'], "tsun")
-        self.assertEquals(json_response['output']['users'][1]['perms'], ['r'])
+        self.assertEquals(json_response['output']['users'][0]['name'], login['username'])
+        self.assertEquals(json_response['output']['users'][0]['perms'], ['r'])
 
-        payload = {"data": json.dumps([{"name": "tsun", "perms": ["r", "w"]}])}
+        payload = {"data": json.dumps([{"name": login['username'], "perms": ["r", "w"]}])}
         r = self.client.post(newt_base_url + "/stores/test_store_1/perms/", data=payload)
 
         r = self.client.get(newt_base_url + "/stores/test_store_1/perms/")
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['name'], "test_store_1")
-        self.assertEquals(json_response['output']['users'][1]['name'], "tsun")
-        self.assertEquals(json_response['output']['users'][1]['perms'], ['r', 'w'])
+        self.assertEquals(json_response['output']['users'][0]['name'], login['username'])
+        self.assertEquals(json_response['output']['users'][0]['perms'], ['r', 'w'])
 
         self.client.delete(newt_base_url + "/stores/test_store_1/")
         r = self.client.get(newt_base_url + "/stores/test_store_1/perms/")
