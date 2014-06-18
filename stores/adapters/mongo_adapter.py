@@ -30,7 +30,7 @@ from django.http import QueryDict
 import logging
 logger = logging.getLogger(__name__)
 
-def get_stores():
+def get_stores(request):
     """Returns a list of available store names.
 
     Keyword arguments:
@@ -39,7 +39,7 @@ def get_stores():
     db = MongoClient()['stores']
     return filter(lambda s: s!="system.indexes", db.collection_names())
 
-def create_store(request, store_name):
+def create_store(request, store_name=None, initial_data=[]):
     """Creates a store with the given store_name and initial_data; Returns a 
     dictionary in the form of:
     {
@@ -58,9 +58,9 @@ def create_store(request, store_name):
     # Check that store name is unique (or create unique identifier)
     if not store_name:
         store_name = random.choice(string.ascii_letters) + str(uuid.uuid4())[0:8]
-        while(store_name in get_stores()):
+        while(store_name in get_stores(request)):
             store_name = str(uuid.uuid4())[0:8]
-    elif store_name in get_stores():
+    elif store_name in get_stores(request):
         return json_response(status="ERROR", status_code=400, error="Store name already exists.")
     
     # Loads the initial data if it exists
@@ -89,7 +89,7 @@ def create_store(request, store_name):
     # Return the name of the store/status/objects created
     return {"id": new_collection.name, "oid": oid_list}
 
-def get_store_contents(store_name):
+def get_store_contents(request, store_name):
     """Returns a list containing all the contents of the store in the form of:
     [
         {
@@ -104,7 +104,7 @@ def get_store_contents(store_name):
     store_name -- the name of the store
     """
     # Check existance of the store
-    if store_name not in get_stores():
+    if store_name not in get_stores(request):
         return json_response(status="ERROR", 
                              status_code=404, 
                              error="Store does not exist: %s" % store_name)
@@ -116,7 +116,7 @@ def get_store_contents(store_name):
     store = db[store_name]
     return [x['data'] for x in store.find({}, {"_id":0, "data":1})]
 
-def query_store(store_name, query):
+def query_store(request, store_name, query):
     """Queries the store; Returns the result of the query in the form of:
     [
         {
@@ -135,7 +135,7 @@ def query_store(store_name, query):
     # Run query on the given store and return results
     pass
 
-def store_get_obj(store_name, obj_id):
+def store_get_obj(request, store_name, obj_id):
     """Returns the data of the specified document in the store.
 
     Keyword arguments:
@@ -155,7 +155,7 @@ def store_get_obj(store_name, obj_id):
                              error="Object not found: %s - Object %s" 
                                     % (store_name, obj_id))
 
-def store_insert(request, store_name):
+def store_insert(request, store_name, initial_data):
     """Creates a new document in the store with initial_data; Returns the oid 
     of the new document.
 
@@ -176,7 +176,7 @@ def store_insert(request, store_name):
     store.insert({"oid": oid, "data": data})
     return {"id": oid}
 
-def store_update(request, store_name, obj_id):
+def store_update(request, store_name, obj_id, data):
     """Updates the contents of a given document; Returns the oid of the 
     document.
 
@@ -197,7 +197,7 @@ def store_update(request, store_name, obj_id):
     store.update({"oid":obj_id},{"$set":{"data": data}})
     return data
 
-def get_store_perms(store_name):
+def get_store_perms(request, store_name):
     """Returns a dictionary of permissions of the store in the form of:
     {
         "name": <store_name>,
@@ -223,7 +223,7 @@ def get_store_perms(store_name):
     else:
         return json_response(status="ERROR", status_code="404", error="Store not found")
 
-def update_store_perms(request, store_name):
+def update_store_perms(request, store_name, perms):
     """Updates the permissions of the given store with perms; Returns the id of
     the store.
 
@@ -254,7 +254,7 @@ def update_store_perms(request, store_name):
         perm_col.update({"name": store_name}, {"$addToSet":{"users": new_perm}})
     return {"id": store_name}
 
-def delete_store(store_name):
+def delete_store(request, store_name):
     """Deletes the store with a given store_name; Returns the id of the deleted
     store.
 
