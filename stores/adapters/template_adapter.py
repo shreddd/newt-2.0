@@ -55,7 +55,7 @@ def get_store_contents(request, store_name):
    pass
 
 def query_store(request, store_name, query):
-    """Returns the result of querying the given store with query in the form of:
+    """Queries the store; Returns the result of the query in the form of:
     [
         {
             "oid": <document_id>,
