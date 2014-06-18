@@ -31,16 +31,29 @@ import logging
 logger = logging.getLogger(__name__)
 
 def get_stores():
-    """Returns a list of available stores"""
+    """Returns a list of available store names.
+
+    Keyword arguments:
+    request -- Django HttpRequest object
+    """
     db = MongoClient()['stores']
     return filter(lambda s: s!="system.indexes", db.collection_names())
 
 def create_store(request, store_name):
-    """Creates a store with the given store_name and initial_data
+    """Creates a store with the given store_name and initial_data; Returns a 
+    dictionary in the form of:
+    {
+        "id": <store_name>, 
+        "oid": <list_of_initial_data_ids>
+    }
 
     Keyword arguments:
-    request -- request the data can be derived from
-    store_name -- the name of the store
+    request -- Django HttpRequest object
+    store_name -- the name of the store (optional)
+    initial_data -- Array of data to be stored (optional)
+    
+    Note: if the store_name is not set, the implementation should create a name
+    for the store.
     """
     # Check that store name is unique (or create unique identifier)
     if not store_name:
@@ -76,26 +89,18 @@ def create_store(request, store_name):
     # Return the name of the store/status/objects created
     return {"id": new_collection.name, "oid": oid_list}
 
-def delete_store(store_name):
-    """Deletes the store with a given store_name
-
-    Keyword arguments:
-    store_name -- the name of the store
-    """
-    # Check privlages of user attempting to delete store
-    # Delete store
-    # Return the status/output of the operation
-    db = MongoClient()['stores']
-    store = db[store_name]
-    store.drop()
-    perms = db['permissions']
-    perms.find_and_modify({"name": store_name}, remove=True)
-    return {"dropped": store_name}
-
 def get_store_contents(store_name):
-    """Returns a list containing all the contents of the store
+    """Returns a list containing all the contents of the store in the form of:
+    [
+        {
+            "oid": <document_id>,
+            "data": <document_data>,
+        },
+        ...
+    ]
 
     Keyword arguments:
+    request -- Django HttpRequest object
     store_name -- the name of the store
     """
     # Check existance of the store
@@ -112,9 +117,17 @@ def get_store_contents(store_name):
     return [x['data'] for x in store.find({}, {"_id":0, "data":1})]
 
 def query_store(store_name, query):
-    """Returns the result of querying the given store with query
+    """Queries the store; Returns the result of the query in the form of:
+    [
+        {
+            "oid": <document_id>,
+            "data": <document_data>,
+        },
+        ...
+    ]
 
     Keyword arguments:
+    request -- Django HttpRequest object
     store_name -- the name of the store
     query -- a query string
     """
@@ -122,10 +135,83 @@ def query_store(store_name, query):
     # Run query on the given store and return results
     pass
 
-def get_store_perms(store_name):
-    """Returns a dictionary of permissions of the store
+def store_get_obj(store_name, obj_id):
+    """Returns the data of the specified document in the store.
 
     Keyword arguments:
+    request -- Django HttpRequest object
+    store_name -- the name of the store
+    obj_id -- ID of the object in the store
+    """
+    # Gets the value of the key in the store
+    db = MongoClient()['stores']
+    store = db[store_name]
+    obj = store.find_one({"oid":obj_id},{"_id":0, "data":1})
+    if obj:
+        return obj['data']
+    else:
+        return json_response(status="ERROR",
+                             status_code=400,
+                             error="Object not found: %s - Object %s" 
+                                    % (store_name, obj_id))
+
+def store_insert(request, store_name):
+    """Creates a new document in the store with initial_data; Returns the oid 
+    of the new document.
+
+    Keyword arguments:
+    request -- Django HttpRequest object
+    store_name -- the name of the store
+    initial_data -- document data
+    """
+    # Get the data
+    data = request.POST.get("data", None)
+    if not data:
+        return json_response(status="ERROR", status_code=400, error="No data received.")
+
+    # Insert the key value pairs into the store
+    db = MongoClient()['stores']
+    store = db[store_name]
+    oid = str(store.count())
+    store.insert({"oid": oid, "data": data})
+    return {"id": oid}
+
+def store_update(request, store_name, obj_id):
+    """Updates the contents of a given document; Returns the oid of the 
+    document.
+
+    Keyword arguments:
+    request -- Django HttpRequest object
+    store_name -- the name of the store
+    obj_id -- ID of the document in the store
+    data -- Updated data of the document
+    """
+    # Get data from PUT request
+    data = json.loads(request.body).get("data", None)
+    if not data:
+        return json_response(status="ERROR", status_code=400, error="No data received.")
+
+    # Set the key of the store to the new value
+    db = MongoClient()['stores']
+    store = db[store_name]
+    store.update({"oid":obj_id},{"$set":{"data": data}})
+    return data
+
+def get_store_perms(store_name):
+    """Returns a dictionary of permissions of the store in the form of:
+    {
+        "name": <store_name>,
+        "perms": [
+            {
+                "user": <associated_user>,
+                "perms": <permissions_of_user>,
+            },
+            ...
+        ],
+    }
+
+    Keyword arguments:
+    request -- Django HttpRequest object
     store_name -- the name of the store
     """
     # Return the permissions of the store
@@ -138,18 +224,20 @@ def get_store_perms(store_name):
         return json_response(status="ERROR", status_code="404", error="Store not found")
 
 def update_store_perms(request, store_name):
-    """Updates the permissions of the given store with perms
+    """Updates the permissions of the given store with perms; Returns the id of
+    the store.
 
     Keyword arguments:
+    request -- Django HttpRequest object
     store_name -- the name of the store
-    perms -- dictionary of the updated permissions
-            [
-                {
-                    "name": ..., 
-                    "perms": [...]
-                }, 
-                ... 
-            ]
+    perms -- list of the new permissions in the form of:
+        [
+            {
+                "user": <user_to_be_updated>,
+                "perms": <updated_perms>,
+            },
+            ...
+        ]
     """
     # Gets updated permissions from the request
     perms = request.POST.get("data", None)
@@ -166,60 +254,19 @@ def update_store_perms(request, store_name):
         perm_col.update({"name": store_name}, {"$addToSet":{"users": new_perm}})
     return {"id": store_name}
 
-def store_insert(request, store_name):
-    """Inserts data into the store
+def delete_store(store_name):
+    """Deletes the store with a given store_name; Returns the id of the deleted
+    store.
 
     Keyword arguments:
     store_name -- the name of the store
-    data -- a list of key value pairs to be put in the store
     """
-    # Get the data
-    data = request.POST.get("data", None)
-    if not data:
-        return json_response(status="ERROR", status_code=400, error="No data received.")
-
-    # Insert the key value pairs into the store
+    # Check privlages of user attempting to delete store
+    # Delete store
+    # Return the status/output of the operation
     db = MongoClient()['stores']
     store = db[store_name]
-    oid = str(store.count())
-    store.insert({"oid": oid, "data": data})
-    return {"id": oid}
-
-def store_update(request, store_name, obj_id):
-    """Updates a certain key-value pair in the store
-
-    Keyword arguments:
-    request -- Django HttpRequest object
-    store_name -- the name of the store
-    obj_id -- ID of the object in the store
-    """
-    # Get data from PUT request
-    data = json.loads(request.body).get("data", None)
-    if not data:
-        return json_response(status="ERROR", status_code=400, error="No data received.")
-
-    # Set the key of the store to the new value
-    db = MongoClient()['stores']
-    store = db[store_name]
-    store.update({"oid":obj_id},{"$set":{"data": data}})
-    return data
-
-def store_get_obj(store_name, obj_id):
-    """Gets the value of the specified key in the store 
-
-    Keyword arguments:
-    store_name -- the name of the store
-    key -- the key at which the value is store in the store
-    """
-    # Gets the value of the key in the store
-    db = MongoClient()['stores']
-    store = db[store_name]
-    obj = store.find_one({"oid":obj_id},{"_id":0, "data":1})
-    if obj:
-        return obj['data']
-    else:
-        return json_response(status="ERROR",
-                             status_code=400,
-                             error="Object not found: %s - Object %s" 
-                                    % (store_name, obj_id))
-
+    store.drop()
+    perms = db['permissions']
+    perms.find_and_modify({"name": store_name}, remove=True)
+    return {"dropped": store_name}
