@@ -12,7 +12,6 @@ Structure:
     - Permissions (?) are stored in the 'permissions' collection as:
         {
             "name": Name of the store 
-            "groups": Groups associated with the store 
             "owner": Owner of the store
             "users": Users with access to the store as:
                 {
@@ -63,9 +62,6 @@ def create_store(request, store_name=None, initial_data=[]):
     elif store_name in get_stores(request):
         return json_response(status="ERROR", status_code=400, error="Store name already exists.")
     
-    # Loads the initial data if it exists
-    initial_data = json.loads(request.POST.get("data", "[]"))
-
     # Create new collection
     db = MongoClient()['stores']
     new_collection = db.create_collection(store_name)
@@ -74,14 +70,13 @@ def create_store(request, store_name=None, initial_data=[]):
     oid_list = []
     for oid, data in enumerate(initial_data):
         new_collection.insert({"oid": str(oid), "data": data})
-        oid_list.append(oid)
+        oid_list.append(str(oid))
     # Add entry to permissions
     perms = db['permissions']
     perms.insert({
         "name": store_name,
-        "groups": [],
         "owner": request.user.username,
-        "users": [{
+        "perms": [{
             "name": request.user.username,
             "perms": ['r', 'w'],
         }],
@@ -114,7 +109,7 @@ def get_store_contents(request, store_name):
     # Get and return contents of the store
     db = MongoClient()['stores']
     store = db[store_name]
-    return [x['data'] for x in store.find({}, {"_id":0, "data":1})]
+    return [{"oid": x["oid"], "data": x['data']} for x in store.find({}, {"_id":0, "data":1, "oid":1})]
 
 def query_store(request, store_name, query):
     """Queries the store; Returns the result of the query in the form of:
@@ -131,9 +126,7 @@ def query_store(request, store_name, query):
     store_name -- the name of the store
     query -- a query string
     """
-    # Check privlages of user attempting to acccess store
-    # Run query on the given store and return results
-    pass
+    return json_response(status="ERROR", status_code=501, error="Unimplemented")
 
 def store_get_obj(request, store_name, obj_id):
     """Returns the data of the specified document in the store.
@@ -165,7 +158,7 @@ def store_insert(request, store_name, initial_data):
     initial_data -- document data
     """
     # Get the data
-    data = request.POST.get("data", None)
+    data = initial_data
     if not data:
         return json_response(status="ERROR", status_code=400, error="No data received.")
 
@@ -174,7 +167,7 @@ def store_insert(request, store_name, initial_data):
     store = db[store_name]
     oid = str(store.count())
     store.insert({"oid": oid, "data": data})
-    return {"id": oid}
+    return oid
 
 def store_update(request, store_name, obj_id, data):
     """Updates the contents of a given document; Returns the oid of the 
@@ -186,16 +179,11 @@ def store_update(request, store_name, obj_id, data):
     obj_id -- ID of the document in the store
     data -- Updated data of the document
     """
-    # Get data from PUT request
-    data = json.loads(request.body).get("data", None)
-    if not data:
-        return json_response(status="ERROR", status_code=400, error="No data received.")
-
     # Set the key of the store to the new value
     db = MongoClient()['stores']
     store = db[store_name]
     store.update({"oid":obj_id},{"$set":{"data": data}})
-    return data
+    return str(obj_id)
 
 def get_store_perms(request, store_name):
     """Returns a dictionary of permissions of the store in the form of:
@@ -239,20 +227,15 @@ def update_store_perms(request, store_name, perms):
             ...
         ]
     """
-    # Gets updated permissions from the request
-    perms = request.POST.get("data", None)
-    if not perms:
-        return json_response(status="ERROR", status_code=400, error="No data received.")
-
     # Updates the permissions of the store and returns the status
     db = MongoClient()['stores']
     perm_col = db['permissions']
-    for new_perm in json.loads(perms):
+    for new_perm in perms:
         # Remove original permission
-        perm_col.update({"name": store_name}, {"$pull": {"users": {"name": new_perm['name']}}})
+        perm_col.update({"name": store_name}, {"$pull": {"perms": {"name": new_perm['name']}}})
         # Insert new permission
-        perm_col.update({"name": store_name}, {"$addToSet":{"users": new_perm}})
-    return {"id": store_name}
+        perm_col.update({"name": store_name}, {"$addToSet":{"perms": new_perm}})
+    return store_name
 
 def delete_store(request, store_name):
     """Deletes the store with a given store_name; Returns the id of the deleted
@@ -269,4 +252,4 @@ def delete_store(request, store_name):
     store.drop()
     perms = db['permissions']
     perms.find_and_modify({"name": store_name}, remove=True)
-    return {"dropped": store_name}
+    return store_name
