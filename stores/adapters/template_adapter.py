@@ -23,7 +23,7 @@ def get_stores(request):
     """
     pass
 
-def create_store(request, store_name, initial_data=None):
+def create_store(request, store_name=None, initial_data=None):
     """Creates a store with the given store_name and initial_data; Returns a 
     dictionary in the form of:
     {
@@ -33,8 +33,11 @@ def create_store(request, store_name, initial_data=None):
 
     Keyword arguments:
     request -- Django HttpRequest object
-    store_name -- the name of the store
+    store_name -- the name of the store (optional)
     initial_data -- Array of data to be stored (optional)
+    
+    Note: if the store_name is not set, the implementation should create a name
+    for the store.
     """
     pass
 
