@@ -79,7 +79,7 @@ def delete_store(store_name):
         storedb.delete(entry)
 
     storedb.delete(store_name + ":docs")
-    storedb.lrem("stores", 1, store_name)
+    storedb.lrem("stores", store_name, 1)
 
     # Returns message indicating the successful deletion
     return {"msg": store_name + " has successfully been deleted"}
@@ -92,7 +92,7 @@ def get_store_contents(store_name):
     store_name -- the name of the store
     """
     storedb = redis.Redis(host=HOST, db=STOREDB)
-
+    return storedb.lrange(store_name + ":docs",0,-1)
     
 
 def query_store(store_name, query):
@@ -113,11 +113,11 @@ def get_store_perms(store_name):
     store_name -- the name of the store
     """
     storedb = redis.Redis(host=HOST, db=STOREDB)
-    all_perm_entries = storedb.keys(store_name+":perms:*")
+    all_perm_entries = storedb.lrange(store_name+":perms", 0, -1)
     perms_dict = {}
 
     for entry in all_perm_entries:
-        perms_dict[entry[len(store_name) + 7:]] = storedb.lget(entry,0,-1)
+        perms_dict[entry[len(store_name) + 7:]] = storedb.lrange(entry,0,-1)
 
     return perms_dict
 
@@ -150,7 +150,22 @@ def store_insert(request, store_name):
     request -- Django HttpRequest object
     store_name -- the name of the store
     """
+    storedb = redis.Redis(host=HOST, db=STOREDB)
+    # Creating next docname
+    index_num = len(storedb.lrange(store_name + ":docs"))
+    docname = store_name + ":" + index_num
+    # Getting data
 
+    data = request.POST.get("data", None)
+    if not data:
+        return json_response(status="ERROR", status_code=400, error="No data received.")
+
+
+    storedb.set(docname, data)
+    storedb.rpush(store_name + ":docs", docname)
+
+    # Return success message
+    return {'msg': docname + " successfully created!"}
     
 
 def store_update(request, store_name, obj_id):
@@ -161,7 +176,16 @@ def store_update(request, store_name, obj_id):
     store_name -- the name of the store
     obj_id -- ID of the object in the store
     """
-    pass
+    storedb = redis.Redis(host=HOST, db=STOREDB)
+    # Get data from PUT request
+    data = json.loads(request.body).get("data", None)
+    if not data:
+        return json_response(status="ERROR", status_code=400, error="No data received.")
+
+    storedb.set(store_name + ":" + obj_id, data)
+
+    return {'msg': store_name + ":" + obj_id + " successfully updated!"}
+
 
 def store_get_obj(store_name, obj_id):
     """Gets the value of the specified key in the store 
@@ -170,5 +194,6 @@ def store_get_obj(store_name, obj_id):
     store_name -- the name of the store
     obj_id -- ID of the object in the store
     """
-    pass
+    storedb = redis.Redis(host=HOST, db = STOREDB)
+    return storedb.get(store_name + ":" + obj_id)
 
