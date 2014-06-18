@@ -15,72 +15,86 @@ from common.response import json_response
 import logging
 logger = logging.getLogger(__name__)
 
-def get_stores():
-    """Returns a list of available stores"""
-    pass
-
-def create_store(request, store_name):
-    """Creates a store with the given store_name and initial_data
+def get_stores(request):
+    """Returns a list of available store names.
 
     Keyword arguments:
-    request -- request the data can be derived from
-    store_name -- the name of the store
+    request -- Django HttpRequest object
     """
     pass
 
-def delete_store(store_name):
-    """Deletes the store with a given store_name
+def create_store(request, store_name, initial_data=None):
+    """Creates a store with the given store_name and initial_data; Returns a 
+    dictionary in the form of:
+    {
+        "id": <store_name>, 
+        "oid": <list_of_initial_data_ids>
+    }
 
     Keyword arguments:
+    request -- Django HttpRequest object
     store_name -- the name of the store
+    initial_data -- Array of data to be stored (optional)
     """
     pass
 
-def get_store_contents(store_name):
-    """Returns a list containing all the contents of the store
+def get_store_contents(request, store_name):
+    """Returns a list containing all the contents of the store in the form of:
+    [
+        {
+            "oid": <document_id>,
+            "data": <document_data>,
+        },
+        ...
+    ]
 
     Keyword arguments:
+    request -- Django HttpRequest object
     store_name -- the name of the store
     """
    pass
 
-def query_store(store_name, query):
-    """Returns the result of querying the given store with query
+def query_store(request, store_name, query):
+    """Returns the result of querying the given store with query in the form of:
+    [
+        {
+            "oid": <document_id>,
+            "data": <document_data>,
+        },
+        ...
+    ]
 
     Keyword arguments:
+    request -- Django HttpRequest object
     store_name -- the name of the store
     query -- a query string
     """
     pass
 
-def get_store_perms(store_name):
-    """Returns a dictionary of permissions of the store
-
-    Keyword arguments:
-    store_name -- the name of the store
-    """
-    pass
-
-def update_store_perms(request, store_name):
-    """Updates the permissions of the given store with perms
+def store_get_obj(request, store_name, obj_id):
+    """Returns the data of the specified document in the store.
 
     Keyword arguments:
     request -- Django HttpRequest object
     store_name -- the name of the store
+    obj_id -- ID of the object in the store
     """
     pass
 
-def store_insert(request, store_name):
-    """Inserts data into the store
+def store_insert(request, store_name, initial_data):
+    """Creates a new document in the store with initial_data; Returns the oid 
+    of the new document.
 
     Keyword arguments:
     request -- Django HttpRequest object
     store_name -- the name of the store
+    initial_data -- document data
     """
     pass
 
 def store_update(request, store_name, obj_id):
-    """Updates a certain key-value pair in the store
+    """Updates the contents of a given document; Returns the oid of the 
+    document.
 
     Keyword arguments:
     request -- Django HttpRequest object
@@ -89,12 +103,49 @@ def store_update(request, store_name, obj_id):
     """
     pass
 
-def store_get_obj(store_name, obj_id):
-    """Gets the value of the specified key in the store 
+def get_store_perms(request, store_name):
+    """Returns a dictionary of permissions of the store in the form of:
+    {
+        "name": <store_name>,
+        "perms": [
+            {
+                "user": <associated_user>,
+                "perms": <permissions_of_user>,
+            },
+            ...
+        ],
+    }
+
+    Keyword arguments:
+    request -- Django HttpRequest object
+    store_name -- the name of the store
+    """
+    pass
+
+def update_store_perms(request, store_name, perms):
+    """Updates the permissions of the given store with perms; Returns the id of
+    the store.
+
+    Keyword arguments:
+    request -- Django HttpRequest object
+    store_name -- the name of the store
+    perms -- list of the new permissions in the form of:
+        [
+            {
+                "user": <user_to_be_updated>,
+                "perms": <updated_perms>,
+            },
+            ...
+        ]
+    """
+    pass
+
+def delete_store(request, store_name):
+    """Deletes the store with a given store_name; Returns the id of the deleted
+    store.
 
     Keyword arguments:
     store_name -- the name of the store
-    obj_id -- ID of the object in the store
     """
     pass
 
