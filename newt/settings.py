@@ -236,21 +236,8 @@ NEWT_CONFIG = {
             'models': [],
         },
         'STORES': {
-            'adapter': 'stores.adapters.dbstore_adapter',
-            'models': [
-                {
-                    "name": "Store",
-                    "module": "stores.adapters.dbstore_models",
-                },
-                {
-                    "name": "Document",
-                    "module": "stores.adapters.dbstore_models",
-                },
-                {
-                    "name": "Permission",
-                    "module": "stores.adapters.dbstore_models",
-                },
-            ],
+            'adapter': 'stores.adapters.redis_adapter',
+            'models': [],
         },
         'ACCOUNT': {
             'adapter': 'account.adapters.django_adapter',

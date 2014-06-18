@@ -219,6 +219,12 @@ class StoresTests(TestCase):
             db.permissions.remove({"name":"test_store_1"})
         except Exception:
             pass
+        try:
+            import redis
+            storedb = redis.Redis(host="localhost", db=0)
+            storedb.flushdb()
+        except Exception:
+            pass
         # Assumes that the stores database is empty
     def test_stores_basic(self):
         r = self.client.get(newt_base_url + "/stores")
