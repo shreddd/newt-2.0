@@ -92,7 +92,10 @@ def get_store_contents(request, store_name):
     store_docs = storedb.lrange(store_name + ":docs",0,-1)
     store_contents = []
     for doc in store_docs:
-        store_contents.append(storedb.get(doc))
+        store_contents.append({
+            "oid":doc[len(store_name)+1:],
+            "data":storedb.get(doc),
+        })
     return store_contents
 
 def query_store(request, store_name, query):
@@ -110,11 +113,10 @@ def query_store(request, store_name, query):
     store_name -- the name of the store
     query -- a query string
     """
-    storedb = redis.Redis(host=HOST, db=STOREDB)
     if store_name not in get_stores():
         return json_response(status="ERROR", status_code=404, error="Store does not exist.")    
-    
-    return storedb.get(storedb+":"+query)
+    return json_response(status="ERROR", status_code=501, error="Method not implemented.")
+    # return storedb.get(storedb+":"+query)
 
 def store_get_obj(request, store_name, obj_id):
     """Returns the data of the specified document in the store.
@@ -177,7 +179,7 @@ def store_update(request, store_name, obj_id):
 
     storedb.set(store_name + ":" + obj_id, data)
 
-    return data
+    return obj_id
 
 def get_store_perms(request, store_name):
     """Returns a dictionary of permissions of the store in the form of:
@@ -209,7 +211,7 @@ def get_store_perms(request, store_name):
             "perms": storedb.lrange(entry,0,-1)
         })
 
-    return {"name": store_name, "users": perms_list,}
+    return {"name": store_name, "perms": perms_list,}
 
 def update_store_perms(request, store_name, perms):
     """Updates the permissions of the given store with perms; Returns the id of
@@ -231,17 +233,20 @@ def update_store_perms(request, store_name, perms):
     if store_name not in get_stores():
         return json_response(status="ERROR", status_code=404, error="Store does not exist.")    
     
-    perms = request.POST.get("data", None)
-    if not perms:
-        return json_response(status="ERROR", status_code=400, error="No data received.")
-    for new_perm in json.loads(perms):
+    new_perms = []
+
+    for new_perm in perms:
         dbname = store_name + ":perms:" + new_perm['name']
         if storedb.lrange(dbname, 0, -1):
             storedb.delete(dbname)
         for perm in new_perm['perms']:
             storedb.rpush(dbname, perm)
+        new_perms.append({
+            "user": new_perm['name'],
+            "perms": storedb.lrange(dbname,0,-1),
+        })
 
-    return {'id': store_name}
+    return new_perms
 
 def delete_store(request, store_name):
     """Deletes the store with a given store_name; Returns the id of the deleted
@@ -271,4 +276,4 @@ def delete_store(request, store_name):
     storedb.lrem("stores", store_name, 1)
 
     # Returns message indicating the successful deletion
-    return {"msg": store_name + " has successfully been deleted"}
+    return store_name
