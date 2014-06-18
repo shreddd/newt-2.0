@@ -214,12 +214,52 @@ NEWT_CONFIG = {
         {'NAME': 'localhost', 'HOSTNAME': 'localhost' },
     ],
     'ADAPTERS': {
-        'STATUS': 'status.adapters.ping_adapter',
-        'FILE': 'file.adapters.localfile_adapter',
-        'AUTH': 'auth.adapters.dbauth_adapter',
-        'COMMAND': 'command.adapters.exec_adapter',
-        'STORES': 'stores.adapters.redis_adapter',
-        'ACCOUNT': 'account.adapters.django_adapter',
+        'STATUS': {
+            'adapter': 'status.adapters.ping_adapter',
+            'models': [],
+        },
+        'FILE': {
+            'adapter': 'file.adapters.localfile_adapter',
+            'models': [],
+        }, 
+        'AUTH': {
+            'adapter': 'auth.adapters.myproxy_adapter',
+            'models': [
+                {
+                    "name": "Cred",
+                    "module": 'auth.adapters.myproxy_models'
+                },
+            ],
+        },
+        'COMMAND': {
+            'adapter': 'command.adapters.exec_adapter',
+            'models': [],
+        },
+        'STORES': {
+            'adapter': 'stores.adapters.dbstore_adapter',
+            'models': [
+                {
+                    "name": "Store",
+                    "module": "stores.adapters.dbstore_models",
+                },
+                {
+                    "name": "Document",
+                    "module": "stores.adapters.dbstore_models",
+                },
+                {
+                    "name": "Permission",
+                    "module": "stores.adapters.dbstore_models",
+                },
+            ],
+        },
+        'ACCOUNT': {
+            'adapter': 'account.adapters.django_adapter',
+            'models': [],
+        },
+        'JOB': {
+            'adapter': 'job.adapters.unix_adapter',
+            'models': [],
+        },
     },
     'NIM_BASE_URL': 'http://nimprod.nersc.gov:8004',
 

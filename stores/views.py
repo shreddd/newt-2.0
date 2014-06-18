@@ -2,8 +2,9 @@ from newt.views import JSONRestView
 from common.response import json_response
 from django.conf import settings
 import json
+from importlib import import_module
 
-store_adapter = __import__(settings.NEWT_CONFIG['ADAPTERS']['STORES'], globals(), locals(), ['adapter'], -1)
+store_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['STORES']['adapter'])
 
 import logging
 

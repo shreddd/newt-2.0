@@ -1,6 +1,7 @@
 # Ping Status Adapter
 from django.conf import settings
 import os
+from common.shell import run_command
 from common.response import json_response
 import logging
 logger = logging.getLogger(__name__)
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def ping(machine_name, hostname):
     # Do a single ping with timeout 2 seconds
-    retcode = os.system('ping -c1 -t2 %s' % hostname)
+    (output, err, retcode) = run_command('ping -c1 -t2 %s' % hostname)
     if retcode == 0:
         return {'system': machine_name, 'status': 'up'}
     else:

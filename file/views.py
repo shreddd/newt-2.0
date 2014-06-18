@@ -3,7 +3,8 @@ from common.response import json_response
 from django.http import HttpResponse, HttpResponseServerError, StreamingHttpResponse
 from django.conf import settings
 
-file_adapter = __import__(settings.NEWT_CONFIG['ADAPTERS']['FILE'], globals(), locals(), ['adapter'], -1)
+from importlib import import_module
+file_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['FILE']['adapter'])
 
 
 import logging

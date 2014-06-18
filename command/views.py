@@ -3,7 +3,8 @@ from common.response import json_response
 from django.conf import settings
 import urllib
 
-command_adapter = __import__(settings.NEWT_CONFIG['ADAPTERS']['COMMAND'], globals(), locals(), ['adapter'], -1)
+from importlib import import_module
+command_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['COMMAND']['adapter'])
 
 import logging
 logger = logging.getLogger(__name__)

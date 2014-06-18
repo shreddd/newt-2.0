@@ -24,5 +24,6 @@ urlpatterns = patterns('',
     (r'^api/command', include('command.urls')),
     (r'^api/stores', include('stores.urls')),
     (r'^api/account', include('account.urls')),
+    (r'^api/queue', include('job.urls')),
 
 )
