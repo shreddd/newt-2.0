@@ -155,7 +155,7 @@ def store_insert(request, store_name, initial_data):
     storedb.set(docname, data)
     storedb.rpush(store_name + ":docs", docname)
 
-    return {'id': str(index_num)}
+    return str(index_num)
 
 def store_update(request, store_name, obj_id, data):
     """Updates the contents of a given document; Returns the oid of the 
