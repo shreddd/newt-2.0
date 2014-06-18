@@ -23,7 +23,7 @@ def get_stores(request):
     """
     pass
 
-def create_store(request, store_name=None, initial_data=None):
+def create_store(request, store_name=None, initial_data=[]):
     """Creates a store with the given store_name and initial_data; Returns a 
     dictionary in the form of:
     {
@@ -95,14 +95,15 @@ def store_insert(request, store_name, initial_data):
     """
     pass
 
-def store_update(request, store_name, obj_id):
+def store_update(request, store_name, obj_id, data):
     """Updates the contents of a given document; Returns the oid of the 
     document.
 
     Keyword arguments:
     request -- Django HttpRequest object
     store_name -- the name of the store
-    obj_id -- ID of the object in the store
+    obj_id -- ID of the document in the store
+    data -- Updated data of the document
     """
     pass
 
