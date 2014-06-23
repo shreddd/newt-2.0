@@ -1,8 +1,17 @@
 """
-    Database names will be store:store_name
+    Database Structure:
 
-    Permissions: 
-        store_name:perms:name ['r','w']
+        "stores" - A list of all of the stores in the database
+
+        For every store: 
+            <store_name>:docs - A list of all of the documents within the store
+            <store_name>:perms - A list of all of the permissions of the store
+
+        Documents:
+            <store_name>:<document_id>
+
+        Permissions: 
+            <store_name>:perms:<username> ['r','w']
 """
 
 
