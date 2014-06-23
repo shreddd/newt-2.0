@@ -10,16 +10,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# /api/jobs
 class JobRootView(JSONRestView):
     def get(self, request):
         return job_adapter.get_queues()
 
+# /api/jobs/<machine>/ <-- Change
 class JobQueueView(JSONRestView):
     def get(self, request, queue):
         return job_adapter.view_queue(request, queue)
     def post(self, request, queue):
         return job_adapter.submit_job(request, queue)
 
+# /api/jobs/<machine>/<job_id>/
 class JobDetailView(JSONRestView):
     def get(self, request, queue, job_id):
         return job_adapter.get_info(queue, job_id)

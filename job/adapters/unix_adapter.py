@@ -58,7 +58,7 @@ def submit_job(request, machine_name):
                              error="No data received")
 
     # Generate unique outfile name
-    tmp_job_name = str(ObjectId()) + ".out"
+    tmp_job_name = str(ObjectId())
 
     # Get job emulator path
     job_emu = settings.PROJECT_DIR + "/job/adapters/emulate_job_run.sh"

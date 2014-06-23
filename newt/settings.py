@@ -216,36 +216,31 @@ NEWT_CONFIG = {
     'ADAPTERS': {
         'STATUS': {
             'adapter': 'status.adapters.ping_adapter',
-            'models': [],
+            'models': "",
         },
         'FILE': {
             'adapter': 'file.adapters.localfile_adapter',
-            'models': [],
+            'models': "",
         }, 
         'AUTH': {
             'adapter': 'auth.adapters.myproxy_adapter',
-            'models': [
-                {
-                    "name": "Cred",
-                    "module": 'auth.adapters.myproxy_models'
-                },
-            ],
+            'models': 'auth.adapters.myproxy_models',
         },
         'COMMAND': {
             'adapter': 'command.adapters.exec_adapter',
-            'models': [],
+            'models': "",
         },
         'STORES': {
             'adapter': 'stores.adapters.redis_adapter',
-            'models': [],
+            'models': "",
         },
         'ACCOUNT': {
             'adapter': 'account.adapters.django_adapter',
-            'models': [],
+            'models': "",
         },
         'JOB': {
             'adapter': 'job.adapters.unix_adapter',
-            'models': [],
+            'models': "",
         },
     },
     'NIM_BASE_URL': 'http://nimprod.nersc.gov:8004',

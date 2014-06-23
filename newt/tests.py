@@ -420,7 +420,7 @@ class JobTests(TestCase):
         json_response = r.json()
         self.assertEquals(json_response['output']['jobid'], job_id)
         self.assertEquals(json_response['output']['user'], login['username'])
-
+        
         # Delete job from queue
         r = self.client.delete(newt_base_url + "/queue/localhost/%s/" % job_id)
         self.assertEquals(r.status_code, 200)

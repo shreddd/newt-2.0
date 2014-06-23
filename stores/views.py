@@ -21,7 +21,7 @@ class StoresRootView(JSONRestView):
         initial_data = request.POST.getlist("data")
         return store_adapter.create_store(request, initial_data=initial_data)
 
-
+# /stores/<store_name>/
 class StoresView(JSONRestView):
     def get(self, request, store_name):
         if request.GET.get("query", False):
