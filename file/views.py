@@ -16,15 +16,15 @@ logger = logging.getLogger(__name__)
 class FileRootView(JSONRestView):
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
-        return file_adapter.get_systems()
+        return file_adapter.get_systems(request)
 
 class FileView(JSONRestView):
     def get(self, request, machine_name, path):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
         if request.GET.get("download", False):
-            return file_adapter.download_path(machine_name, path)
+            return file_adapter.download_path(request, machine_name, path)
         else:
-            return file_adapter.get_dir(machine_name, path)
+            return file_adapter.get_dir(request, machine_name, path)
         
     def put(self, request, machine_name, path):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))

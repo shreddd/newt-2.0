@@ -17,7 +17,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def download_path(machine_name, path):
+def download_path(request, machine_name, path):
     """Returns a StreamingHttpResponse with the file
 
     Keyword arguments:
@@ -38,7 +38,7 @@ def put_file(request, machine, path):
     pass
     
     
-def get_dir(machine_name, path):
+def get_dir(request, machine_name, path):
     """Returns a directory listing of path (as an array)
 
     Keyword arguments:
@@ -48,7 +48,7 @@ def get_dir(machine_name, path):
     pass
 
 
-def get_systems():
+def get_systems(request):
     """Returns a list of all the systems available
     """
     pass

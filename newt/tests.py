@@ -154,12 +154,25 @@ class FileTests(TestCase):
         tmpfile = "/tmp/tmp_newt.txt"
         with open(tmpfile, 'w') as f:
             f.write('hello newt')
-            
+        # f.flush()
+        f.close()
         r = self.client.get(newt_base_url+'/file/localhost/tmp/tmp_newt.txt?download=true')
         self.assertEquals(r.status_code, 200)
 
         self.assertEquals(r.streaming_content.next(), 'hello newt')
         os.remove(tmpfile)
+
+    def test_uploadfile(self):
+        r = self.client.put(newt_base_url + "/file/localhost/tmp/tmp_newt_2.txt", data="hello newt")
+        self.assertEqual(r.status_code, 200)
+        json_response = r.json()
+        self.assertEquals(json_response['output']['location'], "/tmp/tmp_newt_2.txt")
+        r = self.client.get(newt_base_url+'/file/localhost/tmp/tmp_newt_2.txt?download=true')
+        self.assertEquals(r.status_code, 200)
+        self.assertEquals(r.streaming_content.next(), 'hello newt')
+        os.remove("/tmp/tmp_newt_2.txt")
+
+
 
 class AuthTests(TestCase):
     fixtures = ["test_fixture.json"]
