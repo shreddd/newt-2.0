@@ -65,15 +65,15 @@ GRID_RESOURCE_TABLE = dict(
 
 MYPROXY_CONFIG = dict(
     SERVER="nerscca2.nersc.gov",
-    PATH="/tmp",
+    PATH="/global/scratch2/sd/tsun/",
     PREFIX="newt_x509up_u",
 )
 
 GLOBUS_CONF = {
-    "LOCATION": "/usr/local/globus",
+    "LOCATION": "/global/common/datatran/dsg/globus-5.0.4/",
     "TCP_PORT_RANGE": "60000,65000",
     "HOSTNAME": "newt.nersc.gov",
-    "LIB_PATH": "/usr/local/globus/lib64"
+    "LIB_PATH": "/global/common/datatran/dsg/globus-5.0.4/lib/"
 }
 
 def is_sanitized(cls, input):
