@@ -223,16 +223,16 @@ NEWT_CONFIG = {
             'models': "",
         }, 
         'AUTH': {
-            'adapter': 'auth.adapters.myproxy_adapter',
-            'models': 'auth.adapters.myproxy_models',
+            'adapter': 'auth.adapters.dbauth_adapter',
+            'models': "",
         },
         'COMMAND': {
             'adapter': 'command.adapters.exec_adapter',
             'models': "",
         },
         'STORES': {
-            'adapter': 'stores.adapters.redis_adapter',
-            'models': "",
+            'adapter': 'stores.adapters.dbstore_adapter',
+            'models': "stores.adapters.dbstore_models",
         },
         'ACCOUNT': {
             'adapter': 'account.adapters.django_adapter',
