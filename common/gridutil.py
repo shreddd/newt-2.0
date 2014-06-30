@@ -78,7 +78,7 @@ GLOBUS_CONF = {
     "LIB_PATH": "/global/common/datatran/dsg/globus-5.0.4/lib/"
 }
 
-def is_sanitized(cls, input):
+def is_sanitized(input):
     return not re.search(r'[^ a-zA-Z0-9!@#%^_+:./-]', input)
 
 def get_cred_env(user):
@@ -117,7 +117,7 @@ def get_cred_env(user):
 
     return env
 
-def get_grid_path(cls, machine, path):
+def get_grid_path(machine, path):
     hostname = GRID_RESOURCE_TABLE[machine].get('hostname', machine)
     path = urllib.unquote(path)
     path = urllib.pathname2url(path)
