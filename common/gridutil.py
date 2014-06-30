@@ -2,6 +2,7 @@ import shlex
 import os
 import urllib
 import re
+from auth.models import Cred
 
 GRID_RESOURCE_TABLE = dict(
     genepool=dict(
