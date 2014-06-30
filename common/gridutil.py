@@ -1,6 +1,7 @@
 import shlex
 import os
 import urllib
+import re
 
 GRID_RESOURCE_TABLE = dict(
     genepool=dict(
