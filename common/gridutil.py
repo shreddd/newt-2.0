@@ -1,5 +1,6 @@
 import shlex
 import os
+import urllib
 
 GRID_RESOURCE_TABLE = dict(
     genepool=dict(
@@ -65,7 +66,8 @@ GRID_RESOURCE_TABLE = dict(
 
 MYPROXY_CONFIG = dict(
     SERVER="nerscca2.nersc.gov",
-    PATH="/global/scratch2/sd/tsun/",
+    # PATH="/global/scratch2/sd/tsun/",
+    PATH="/tmp/",
     PREFIX="newt_x509up_u",
 )
 
