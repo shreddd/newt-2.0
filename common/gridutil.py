@@ -112,7 +112,7 @@ def get_cred_env(user):
     env['GLOBUS_HOSTNAME'] = GLOBUS_CONF['HOSTNAME']
 
     if env.has_key('LD_LIBRARY_PATH'):        
-        env['LD_LIBRARY_PATH'] = GLOBUS_CONF['LIB_PATH'] + env['LD_LIBRARY_PATH']
+        env['LD_LIBRARY_PATH'] = GLOBUS_CONF['LIB_PATH'] + ":" + env['LD_LIBRARY_PATH']
     else:
         env['LD_LIBRARY_PATH'] = GLOBUS_CONF['LIB_PATH']
 

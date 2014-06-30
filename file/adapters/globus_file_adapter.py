@@ -76,7 +76,7 @@ def get_dir(request, machine_name, path):
     """
     try:
         env = gridutil.get_globus_env(request.user)
-        output, error, ret_code = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "/bin/uberftp -ls" + path, 
+        output, error, ret_code = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/uberftp -ls" + path, 
                                               env=env)
         if retcode != 0:
             return json_response(content=output, status="ERROR", status_code=500, error=error)
