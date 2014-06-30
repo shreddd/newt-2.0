@@ -233,6 +233,7 @@ class MyProxyBackend:
                 raise ex
 
         mycred = Cred(cert=credentials['cert'], key=credentials['key'], calist=''.join(credentials['calist']), user=myuser)
+        mycred.save()
 
         # If we have a request object save the credential in the session
         if request:
