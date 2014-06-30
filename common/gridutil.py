@@ -104,7 +104,7 @@ def get_cred_env(user):
     cred_path = '%s/%s%s' % (MYPROXY_CONFIG['PATH'], 
                              MYPROXY_CONFIG['PREFIX'], 
                              user.username)
-    mk_cert_file(cred_path, cred.cert + cred.key + cred.calist)
+    create_cert(cred_path, cred.cert + cred.key + cred.calist)
 
     env = os.environ.copy()
     env['X509_USER_PROXY'] = cred_path
