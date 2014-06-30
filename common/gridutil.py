@@ -68,8 +68,7 @@ GRID_RESOURCE_TABLE = dict(
 
 MYPROXY_CONFIG = dict(
     SERVER="nerscca2.nersc.gov",
-    # PATH="/global/scratch2/sd/tsun/",
-    PATH="/tmp/",
+    PATH="/global/scratch2/sd/tsun/",
     PREFIX="newt_x509up_u",
 )
 
@@ -110,7 +109,7 @@ def get_cred_env(user):
     env['X509_USER_PROXY'] = cred_path
     env['GLOBUS_LOCATION'] = GLOBUS_CONF['LOCATION']
     env['GLOBUS_TCP_PORT_RANGE'] = GLOBUS_CONF['TCP_PORT_RANGE']
-    env['GLOBUS_HOSTNAME'] = GLOBUS_CONF['GLOBUS_HOSTNAME']
+    env['GLOBUS_HOSTNAME'] = GLOBUS_CONF['HOSTNAME']
 
     if env.has_key('LD_LIBRARY_PATH'):        
         env['LD_LIBRARY_PATH'] = GLOBUS_CONF['LIB_PATH'] + env['LD_LIBRARY_PATH']
