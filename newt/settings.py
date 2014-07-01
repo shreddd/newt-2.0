@@ -244,9 +244,11 @@ NEWT_CONFIG = {
         },
     },
     'NIM_BASE_URL': 'http://nimprod.nersc.gov:8004',
-
-
 }
 
+try:
+    from local_settings import *
+except ImportError:
+    pass
 
 
