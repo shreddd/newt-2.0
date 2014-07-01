@@ -16,35 +16,35 @@ class JobTests(TestCase):
 
     def test_running_cmds(self):
         # Tests getting queues
-        r = self.client.get(newt_base_url + "/queue/")
+        r = self.client.get(newt_base_url + "/job/")
         self.assertEquals(r.status_code, 200)
 
         # Tests submitting a job
         payload = {
             "jobscript": "sleep 5\nls ~"
         }
-        r = self.client.post(newt_base_url + "/queue/localhost/", data=payload)
+        r = self.client.post(newt_base_url + "/job/localhost/", data=payload)
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertIsNot(json_response['output']['jobid'], None)
         job_id = json_response['output']['jobid']
 
         # Tests getting job info
-        r = self.client.get(newt_base_url + "/queue/localhost/%s/" % job_id)
+        r = self.client.get(newt_base_url + "/job/localhost/%s/" % job_id)
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['jobid'], job_id)
         self.assertEquals(json_response['output']['user'], login['username'])
         
         # Delete job from queue
-        r = self.client.delete(newt_base_url + "/queue/localhost/%s/" % job_id)
+        r = self.client.delete(newt_base_url + "/job/localhost/%s/" % job_id)
         self.assertEquals(r.status_code, 200)
 
     def test_short_cmd(self):
         payload = {
             "jobscript": "ls -a /"
         }
-        r = self.client.post(newt_base_url + "/queue/localhost/", data=payload)
+        r = self.client.post(newt_base_url + "/job/localhost/", data=payload)
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertIsNot(json_response['output']['jobid'], None)
@@ -52,7 +52,7 @@ class JobTests(TestCase):
 
         time.sleep(1)
 
-        r = self.client.get(newt_base_url + "/queue/localhost/%s/" % job_id)
+        r = self.client.get(newt_base_url + "/job/localhost/%s/" % job_id)
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['jobid'], job_id)

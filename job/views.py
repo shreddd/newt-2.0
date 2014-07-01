@@ -17,15 +17,15 @@ class JobRootView(JSONRestView):
 
 # /api/jobs/<machine>/ <-- Change
 class JobQueueView(JSONRestView):
-    def get(self, request, queue):
-        return job_adapter.view_queue(request, queue)
-    def post(self, request, queue):
-        return job_adapter.submit_job(request, queue)
+    def get(self, request, machine):
+        return job_adapter.view_queue(request, machine)
+    def post(self, request, machine):
+        return job_adapter.submit_job(request, machine)
 
 # /api/jobs/<machine>/<job_id>/
 class JobDetailView(JSONRestView):
-    def get(self, request, queue, job_id):
-        return job_adapter.get_info(queue, job_id)
+    def get(self, request, machine, job_id):
+        return job_adapter.get_info(machine, job_id)
 
-    def delete(self, request, queue, job_id):
-        return job_adapter.delete_job(queue, job_id)
+    def delete(self, request, machine, job_id):
+        return job_adapter.delete_job(machine, job_id)
