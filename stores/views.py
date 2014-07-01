@@ -63,3 +63,8 @@ class StoresObjView(JSONRestView):
         if not data:
             return json_response(status="ERROR", status_code=400, error="No data received.")
         return store_adapter.store_update(request, store_name, obj_id, data=data)
+
+
+class ExtraStoresView(JSONRestView):
+    def get(self, request, query):
+        return acct_adapter.extras_router(request, query)

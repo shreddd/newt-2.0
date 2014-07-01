@@ -25,3 +25,7 @@ class CommandView(JSONRestView):
                                  status_code=400, 
                                  error="No command received.")
         return command_adapter.execute(machine_name, command)
+
+class ExtraCommandView(JSONRestView):
+    def get(self, request, query):
+        return acct_adapter.extras_router(request, query)

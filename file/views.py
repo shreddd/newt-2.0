@@ -29,3 +29,7 @@ class FileView(JSONRestView):
     def put(self, request, machine_name, path):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
         return file_adapter.put_file(request, machine_name, path)
+
+class ExtraFileView(JSONRestView):
+    def get(self, request, query):
+        return acct_adapter.extras_router(request, query)

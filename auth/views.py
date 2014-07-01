@@ -27,4 +27,6 @@ class AuthView(JSONRestView):
         
         return auth_adapter.logout(request)
 
-
+class ExtraAuthView(JSONRestView):
+    def get(self, request, query):
+        return acct_adapter.extras_router(request, query)

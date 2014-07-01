@@ -58,7 +58,7 @@ def get_group_info(group_name=None, gid=None):
 patterns = (
 )
 
-def info_router(request, query):
+def extras_router(request, query):
     """Maps a query to a function if the pattern matches and returns result
 
     Keyword arguments:

@@ -17,3 +17,7 @@ class StatusView(JSONRestView):
     def get(self, request, machine_name=None):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
         return adapter.get_status(machine_name)
+
+class ExtraStatusView(JSONRestView):
+    def get(self, request, query):
+        return acct_adapter.extras_router(request, query)

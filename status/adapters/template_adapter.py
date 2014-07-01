@@ -23,3 +23,44 @@ def get_status(machine_name=None):
     machine_name -- (optional) name of the machine
     """
     pass
+
+"""A tuple list in the form of:
+    (
+        (compiled_regex_exp, associated_function, request_required),
+        ...
+    )
+
+    Note: The compiled_regex_exp must have named groups corresponding to
+          the arguments of the associated_function
+    Note: if request_required is True, the associated_function must have
+          request as the first argument
+
+    Example:
+        patterns = (
+            (re.compile(r'/usage/(?P<path>.+)$'), get_usage, False),
+            (re.compile(r'/image/(?P<query>.+)$'), get_image, False),
+            (re.compile(r'/(?P<path>.+)$'), get_resource, False),
+        )
+"""
+patterns = (
+)
+
+def extras_router(request, query):
+    """Maps a query to a function if the pattern matches and returns result
+
+    Keyword arguments:
+    request -- Django HttpRequest
+    query -- the query to be matched against
+    """
+    for pattern, func, req in patterns:
+        match = pattern.match(query)
+        if match and req:
+            return func(request, **match.groupdict())
+        elif match:
+            return func(**match.groupdict())
+
+    # Returns an Unimplemented response if no pattern matches
+    return json_response(status="Unimplemented", 
+                             status_code=501, 
+                             error="", 
+                             content="query: %s" % query)

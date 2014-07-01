@@ -14,6 +14,6 @@ class GroupInfoView(JSONRestView):
     def get(self, request, group_name=None, gid=None):
         return acct_adapter.get_group_info(group_name=group_name, gid=gid)
 
-class OtherInfoView(JSONRestView):
+class ExtraAcctView(JSONRestView):
     def get(self, request, query):
-        return acct_adapter.info_router(request, query)
+        return acct_adapter.extras_router(request, query)

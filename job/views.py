@@ -29,3 +29,8 @@ class JobDetailView(JSONRestView):
 
     def delete(self, request, machine, job_id):
         return job_adapter.delete_job(machine, job_id)
+
+
+class ExtraJobView(JSONRestView):
+    def get(self, request, query):
+        return acct_adapter.extras_router(request, query)

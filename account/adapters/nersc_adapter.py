@@ -65,7 +65,7 @@ patterns = (
     (re.compile(r'/(?P<path>.+)$'), get_resource, False),
 )
 
-def info_router(request, query):
+def extras_router(request, query):
     for pattern, func, req in patterns:
         match = pattern.match(query)
         if match and req:

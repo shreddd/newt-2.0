@@ -8,5 +8,6 @@ urlpatterns = patterns('command.views',
     (r'^/(?P<store_name>[^/]+)/$', StoresView.as_view()),
     (r'^/(?P<store_name>[^/]+)/perms/$', StoresPermView.as_view()),
     (r'^/(?P<store_name>[^/]+)/(?P<obj_id>\d+)/$', StoresObjView.as_view()),
+    (r'^(?P<query>.+)/$', ExtraStoresView.as_view()),
 )
     
