@@ -253,3 +253,26 @@ def delete_store(request, store_name):
     perms = db['permissions']
     perms.find_and_modify({"name": store_name}, remove=True)
     return store_name
+
+patterns = (
+)
+
+def extras_router(request, query):
+    """Maps a query to a function if the pattern matches and returns result
+
+    Keyword arguments:
+    request -- Django HttpRequest
+    query -- the query to be matched against
+    """
+    for pattern, func, req in patterns:
+        match = pattern.match(query)
+        if match and req:
+            return func(request, **match.groupdict())
+        elif match:
+            return func(**match.groupdict())
+
+    # Returns an Unimplemented response if no pattern matches
+    return json_response(status="Unimplemented", 
+                             status_code=501, 
+                             error="", 
+                             content="query: %s" % query)

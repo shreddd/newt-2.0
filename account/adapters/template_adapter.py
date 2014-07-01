@@ -13,8 +13,8 @@ Notes:
 """
 from common.response import json_response
 import logging
-logger = logging.getLogger(__name__)
 import re
+logger = logging.getLogger(__name__)
 
 
 def get_user_info(user_name=None, uid=None):
