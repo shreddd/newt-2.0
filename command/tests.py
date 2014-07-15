@@ -14,6 +14,7 @@ except ImportError:
 class CommandTests(TestCase):
     def setUp(self):
         self.client = MyTestClient()
+        self.client.post(newt_base_url + "/auth", data=login)
 
     def test_root(self):
         r = self.client.get(newt_base_url+'/command')
