@@ -112,7 +112,7 @@ def get_cred_env(user):
     env['X509_USER_PROXY'] = cred_path
     env['GLOBUS_LOCATION'] = GLOBUS_CONF['LOCATION']
     env['GLOBUS_TCP_PORT_RANGE'] = GLOBUS_CONF['TCP_PORT_RANGE']
-    env['GLOBUS_HOSTNAME'] = GLOBUS_CONF['HOSTNAME']
+    # env['GLOBUS_HOSTNAME'] = GLOBUS_CONF['HOSTNAME']
 
     if env.has_key('LD_LIBRARY_PATH'):        
         env['LD_LIBRARY_PATH'] = GLOBUS_CONF['LIB_PATH'] + ":" + env['LD_LIBRARY_PATH']
