@@ -4,7 +4,7 @@ import json
 import os
 import socket
 from newt.tests import MyTestClient, newt_base_url, login
-
+from unittest import skipIf
 try:
     from local_settings import test_machine as machine
 except ImportError:
