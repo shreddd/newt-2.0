@@ -10,7 +10,7 @@ adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['STATUS']['adapter'])
 import logging
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 
 class StatusView(JSONRestView):

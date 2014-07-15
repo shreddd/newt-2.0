@@ -7,15 +7,16 @@ from importlib import import_module
 command_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['COMMAND']['adapter'])
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 
+# /api/command/
 class CommandRootView(JSONRestView):
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
         return command_adapter.get_systems()
 
-
+# /api/command/<machine_name>/
 class CommandView(JSONRestView):
     def post(self, request, machine_name):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
@@ -26,6 +27,7 @@ class CommandView(JSONRestView):
                                  error="No command received.")
         return command_adapter.execute(machine_name, command)
 
+# /api/command/<query>/
 class ExtraCommandView(JSONRestView):
     def get(self, request, query):
         return acct_adapter.extras_router(request, query)

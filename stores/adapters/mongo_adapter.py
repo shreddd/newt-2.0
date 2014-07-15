@@ -27,7 +27,7 @@ import json
 import uuid, random, string
 from django.http import QueryDict
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 def get_stores(request):
     """Returns a list of available store names.

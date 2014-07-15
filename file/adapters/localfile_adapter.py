@@ -6,7 +6,7 @@ from django.http import StreamingHttpResponse
 from common.response import json_response
 import tempfile
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 
 def get_mime_type(machine_name=None, path=None, file_handle=None):
@@ -32,6 +32,7 @@ def download_path(request, machine_name, path):
     try:
         file_handle = open(path, 'r')
         content_type = get_mime_type(machine_name, path, file_handle)
+        logger.debug("File download requested: %s" % path)
         return StreamingHttpResponse(file_handle, content_type=content_type)
     except Exception as e:
         logger.error("Could not get file %s" % str(e))

@@ -1,4 +1,7 @@
 from django.contrib import auth
+import logging
+import re
+logger = logging.getLogger("newt." + __name__)
 
 def is_logged_in(request):
     if (request.user is not None) and (request.user.is_authenticated()):
@@ -19,16 +22,21 @@ def get_status(request):
 
 
 def login(request):
-
     username = request.POST['username']
     password = request.POST['password']
     user = auth.authenticate(username=username, password=password)
+
+    logger.debug("Attemping to log in user: %s" % username)
+
     if user is not None:
         auth.login(request, user)
+        logger.info("Successfully logged in user: %s" % username)
 
     return is_logged_in(request)
 
 def logout(request):
+    logger.info("Successfully logged out user: %s" % request.user.username)
+
     auth.logout(request)
 
     return is_logged_in(request)

@@ -3,7 +3,7 @@ from django.forms.models import model_to_dict
 from common.response import json_response
 import re
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt."+__name__)
 
 def get_user_info(user_name, uid):
     """Returns information about the user
@@ -23,6 +23,7 @@ def get_user_info(user_name, uid):
         del user_dict["password"]
         return user_dict
     except Exception:
+        logger.debug("No user found matching query: %s" % (user_name if user_name else uid))
         if user_name:
             return json_response(status="ERROR", 
                                  status_code=404, 
@@ -80,7 +81,7 @@ def get_group_info(group_name, gid):
 patterns = (
 )
 
-def info_router(request, query):
+def extras_router(request, query):
     """Maps a query to a function if the pattern matches and returns result
 
     Keyword arguments:

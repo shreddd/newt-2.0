@@ -1,6 +1,6 @@
 from common.response import json_response
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 from auth.adapters.myproxy_backend import MyProxyBackend
 from django.contrib import auth
 
@@ -33,9 +33,12 @@ def login(request):
     mpb = MyProxyBackend()
     username = request.POST['username'].encode("utf-8")
     password = request.POST['password'].encode("utf-8")
+
+    logger.debug("Attempting to log in user: %s" % username)
     user = mpb.authenticate(username=username, password=password)
     if user is not None:
         auth.login(request, user)
+        logger.info("Successfully logged in user: %s" % username)
     return get_status(request)
 
 
@@ -45,6 +48,7 @@ def logout(request):
     Keyword arguments:
     request -- Django HttpRequest
     """
+    logger.info("Successfully logged out user: %s" % request.user.username)
     auth.logout(request)
     return get_status(request)
 

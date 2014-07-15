@@ -10,14 +10,15 @@ file_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['FILE']['adapter']
 import logging
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
-
+# /api/file/
 class FileRootView(JSONRestView):
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
         return file_adapter.get_systems(request)
 
+# /api/file/<machine_name>/<path>/
 class FileView(JSONRestView):
     def get(self, request, machine_name, path):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
@@ -30,6 +31,7 @@ class FileView(JSONRestView):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
         return file_adapter.put_file(request, machine_name, path)
 
+# /api/file/<query>/
 class ExtraFileView(JSONRestView):
     def get(self, request, query):
         return acct_adapter.extras_router(request, query)

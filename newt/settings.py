@@ -3,6 +3,7 @@ import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+PROJECT_DIR = os.path.dirname(os.path.dirname(__file__))
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -153,9 +154,24 @@ AUTHENTICATION_BACKENDS = (
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+if DEBUG:
+    _LOGDIR = PROJECT_DIR
+else:
+    _LOGDIR = "/var/log/httpd/"
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'full': {
+            'format': '[%(levelname)s] %(asctime)s %(name)s : %(message)s'
+        },
+        'brief': {
+            'format': '[%(levelname)s] %(message)s'
+        },
+        'message_only': {
+            'format': '%(message)s'
+        },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -166,19 +182,36 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'full'
+        },
+        'logfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': _LOGDIR + 'django.log',
+            'formatter': 'full',
+            'maxBytes': 1000000,
+            'backupCount': 3
+        },
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['mail_admins', 'logfile'],
             'level': 'ERROR',
+            'propagate': True,
+        },
+        'newt': {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': True,
         },
     }
 }
 
 # Base NEWT Settings
-PROJECT_DIR = os.path.dirname(os.path.dirname(__file__))
 NEWT_VERSION = '0.5.0'
 NEWT_HOST = 'localhost'
 NEWT_DOMAIN = 'nersc.gov'

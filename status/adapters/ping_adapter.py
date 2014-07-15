@@ -4,7 +4,7 @@ import os
 from common.shell import run_command
 from common.response import json_response
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 
 def ping(machine_name, hostname):

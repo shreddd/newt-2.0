@@ -14,7 +14,7 @@ Notes:
 from django.http import StreamingHttpResponse
 from common.response import json_response
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 from common.shell import run_command
 from common import gridutil
 import tempfile
@@ -30,8 +30,10 @@ def download_path(request, machine_name, path):
     src = gridutil.get_grid_path(path)
     env = gridutil.get_globus_env(request.user)
     dest = "/tmp/newt_"+request.user.name+"/"
+    logger.debug("File download requested: %s (%s)" % (path, src))
     (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-url-copy %s %s" % (src, dest), env=env)
     if retcode != 0:
+        logger.warning("Unable to download file: %s" % src)
         return json_response(content=output, status="ERROR", status_code=500, error=error)
     filename = path.rsplit("/")[-1]
     f = open(dest+"filename", "r")
@@ -59,6 +61,8 @@ def put_file(request, machine, path):
     src = "file:///%s" % tmp_file.name
     env = gridutil.get_globus_env(request.user)
     dest = gridutil.get_grid_path(path)
+
+    logger.debug("Putting file to location: %s" % dest)
 
     (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-url-copy %s %s" % (src, dest), env=env)
     if retcode != 0:

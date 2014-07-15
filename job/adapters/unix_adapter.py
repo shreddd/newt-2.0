@@ -1,6 +1,6 @@
 from common.response import json_response
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 from common.shell import run_command
 import re
 from bson.objectid import ObjectId
@@ -68,6 +68,7 @@ def submit_job(request, machine_name):
 
     # Get/return the job_id from stdout
     job_id = job.stdout.readline().rstrip()
+    logger.debug("Spawned process: %s" % job_id)
     return {"jobid": job_id}    
 
 

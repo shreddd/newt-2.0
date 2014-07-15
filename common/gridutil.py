@@ -3,6 +3,8 @@ import os
 import urllib
 import re
 from auth.models import Cred
+import logging
+logger = logging.getLogger("newt." + __name__)
 
 GRID_RESOURCE_TABLE = dict(
     genepool=dict(
@@ -89,6 +91,7 @@ def get_cred_env(user):
     user -- django.contrib.auth.model.user object
     """
     def create_cert(path, data):
+        logger.debug("Creating x509 cert in directory: %s" % path)
         oldmask=os.umask(077)
         f = file(path,'w')
         f.write(data)
@@ -98,6 +101,7 @@ def get_cred_env(user):
     try:
         cred = Cred.objects.filter(user=user)[0]
     except IndexError:
+        logger.error("No credentials found for user: %s" % user.username)
         raise Exception("No credentials found for user: %s" % user.username)
 
     cred_path = '%s/%s%s' % (MYPROXY_CONFIG['PATH'], 

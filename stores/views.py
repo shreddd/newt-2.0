@@ -9,8 +9,9 @@ store_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['STORES']['adapte
 import logging
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
+# /api/stores/
 class StoresRootView(JSONRestView):
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
@@ -21,7 +22,7 @@ class StoresRootView(JSONRestView):
         initial_data = request.POST.getlist("data")
         return store_adapter.create_store(request, initial_data=initial_data)
 
-# /stores/<store_name>/
+# /api/stores/<store_name>/
 class StoresView(JSONRestView):
     def get(self, request, store_name):
         if request.GET.get("query", False):
@@ -45,6 +46,7 @@ class StoresView(JSONRestView):
     def delete(self, request, store_name):
         return store_adapter.delete_store(request, store_name)
 
+# /api/stores/<store_name>/perms/
 class StoresPermView(JSONRestView):
     def get(self, request, store_name):
         return store_adapter.get_store_perms(request, store_name)
@@ -53,7 +55,7 @@ class StoresPermView(JSONRestView):
         perms = json.loads(request.POST.get("data", "[]"))
         return store_adapter.update_store_perms(request, store_name, perms=perms)
 
-
+# /api/stores/<store_name>/<obj_id>/
 class StoresObjView(JSONRestView):
     def get(self, request, store_name, obj_id):
         return store_adapter.store_get_obj(request, store_name, obj_id)
@@ -64,7 +66,7 @@ class StoresObjView(JSONRestView):
             return json_response(status="ERROR", status_code=400, error="No data received.")
         return store_adapter.store_update(request, store_name, obj_id, data=data)
 
-
+# /api/stores/<query>/
 class ExtraStoresView(JSONRestView):
     def get(self, request, query):
         return acct_adapter.extras_router(request, query)

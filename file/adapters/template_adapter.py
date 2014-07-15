@@ -15,7 +15,7 @@ from django.http import StreamingHttpResponse
 from common.response import json_response
 import logging
 import re
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 
 def download_path(request, machine_name, path):

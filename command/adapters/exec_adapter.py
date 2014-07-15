@@ -1,11 +1,12 @@
 from common.shell import run_command
 from common.response import json_response
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 
 def execute(machine_name, command):
     try:
+        logger.debug("Running command: %s" % command)
         (output, error, retcode) = run_command(command)
         response = {
             'stdout': output,

@@ -17,7 +17,7 @@
 
 from common.response import json_response
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 import redis
 import re

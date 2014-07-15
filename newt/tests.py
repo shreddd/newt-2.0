@@ -4,7 +4,10 @@ from django.test.client import Client
 import json
 
 newt_base_url = "/api"
-login = {"username": "nimonly", "password": "Jst4$Nim"}
+try:
+    from local_settings import test_login as login
+except ImportError:
+    login = {"username": "nimonly", "password": "testpassword"}
 
 class MyTestClient(Client):
     def request(self, **request):
@@ -45,5 +48,4 @@ class BasicTests(TestCase):
 
         json_response = r.json()
         self.assertEquals(json_response['status'], "ERROR")
-        # self.assertEquals(r.headers['content-type'], 'application/json')
         

@@ -7,7 +7,7 @@ from importlib import import_module
 job_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['JOB']['adapter'])
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
 
 # /api/jobs
@@ -15,7 +15,7 @@ class JobRootView(JSONRestView):
     def get(self, request):
         return job_adapter.get_queues()
 
-# /api/jobs/<machine>/ <-- Change
+# /api/jobs/<machine>/
 class JobQueueView(JSONRestView):
     def get(self, request, machine):
         return job_adapter.view_queue(request, machine)
@@ -30,7 +30,7 @@ class JobDetailView(JSONRestView):
     def delete(self, request, machine, job_id):
         return job_adapter.delete_job(machine, job_id)
 
-
+# /api/jobs/<query>/
 class ExtraJobView(JSONRestView):
     def get(self, request, query):
         return acct_adapter.extras_router(request, query)
