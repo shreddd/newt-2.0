@@ -15,6 +15,7 @@ from common.response import json_response
 import logging
 import re
 logger = logging.getLogger("newt." + __name__)
+from common import gridutil 
 
 
 def execute(machine_name, command):
@@ -30,7 +31,11 @@ def execute(machine_name, command):
 def get_systems():
     """Returns a list of all machines available to run commands on
     """
-    pass
+    systems = []
+    for (machine, attr) in gridutil.GRID_RESOURCE_TABLE.iteritems():
+        if 'fork' in attr['jobmanagers']:
+            systems.append(machine)
+    return systems
 
 
 """A tuple list in the form of:
