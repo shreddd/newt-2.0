@@ -19,6 +19,7 @@ from common.shell import run_command
 from common import gridutil
 import tempfile
 import mimetypes
+import re
 
 def download_path(request, machine_name, path):
     """Returns a StreamingHttpResponse with the file
