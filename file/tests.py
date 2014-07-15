@@ -33,11 +33,6 @@ class FileTests(TestCase):
         self.assertEquals(json_response['output'][0]['name'], ".")
         self.assertEquals(json_response['output'][1]['name'], "..")
         
-    def test_getfile(self):
-        r = self.client.get(newt_base_url+'/file/'+machine+'/tmp/tmp_newt.txt?download=true')
-        self.assertEquals(r.status_code, 200)
-        self.assertEquals(r.streaming_content.next(), 'hello newt')
-
     def test_uploadfile(self):
         rand_string = '%010x' % random.randrange(16**10)
         r = self.client.put(newt_base_url + "/file/"+machine+"/tmp/tmp_newt_2.txt", data=rand_string)
