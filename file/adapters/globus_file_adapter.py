@@ -27,7 +27,7 @@ def download_path(request, machine_name, path):
     machine_name -- name of the machine
     path -- path to file
     """
-    src = gridutil.get_grid_path(path)
+    src = gridutil.get_grid_path(machine_name, path)
     env = gridutil.get_cred_env(request.user)
     dest = "/tmp/newt_"+request.user.name+"/"
     logger.debug("File download requested: %s (%s)" % (path, src))
