@@ -15,15 +15,21 @@ from common.response import json_response
 import logging
 import re
 logger = logging.getLogger("newt." + __name__)
+from common import gridutil
+from common.shell import run_command
 
 
 def get_machines(request):
-    """Returns the available queues that jobs can run on
+    """Returns the available machines that jobs can run on
 
     Keyword arguments:
     request - Django HttpRequest
     """
-    pass
+    machines = []
+    for (machine, attrs) in gridutil.GRID_RESOURCE_TABLE.iteritems():
+        if attrs['jobmanagers'] != {}:
+            machines['machine'] = attrs['jobmanagers']
+    return machines
 
 
 def view_queue(request, machine_name):
@@ -33,7 +39,23 @@ def view_queue(request, machine_name):
     request -- Django HttpRequest
     machine_name -- name of the machine
     """
-    pass
+    machine = gridutil.GRID_RESOURCE_TABLE.get(machine_name, None)
+    if not machine:
+        return json_response(status="ERROR", status_code=400, error="Invalid machine name: %s" % machine_name)
+
+    env = gridutil.get_cred_env(request.user)
+    (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-job-run %s qs -w" % (machine['hostname']), env=env)
+    patt = re.compile(r'(?P<job_id>[^\s]+)\s+(?P<status>[^\s]+)\s+(?P<user>[^\s]+)\s+(?P<job_name>[^\s]+)\s+(?P<nodes>\d+)\s+(?P<walltime>[^\s]+)\s+(?P<time_use>[^\s]+)\s+(?P<time_submit>\w{3}\s\d{1,2}\s[\d\:]+)\s+(?P<rank>[^\s]+)\s+(?P<queue>[^\s]+)\s+(?P<q_state>[^\s]+)\s+(?P<processors>[^\s]+)\s+(?P<details>.*)$')
+
+    if retcode != 0:
+        return json_response(status="ERROR", status_code=500, error="Unable to get queue: %s" % error)
+    # filter out stuff that doesn't match pattern
+    output = filter(lambda line: patt.match(line), output)
+
+    # Convert output into dict from group names
+    output = map(lambda x: patt.match(x).groupdict(), output)
+
+    return output
 
 
 def submit_job(request, machine_name):

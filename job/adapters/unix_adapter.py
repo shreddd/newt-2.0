@@ -10,12 +10,12 @@ from datetime import datetime
 import pytz
 
 def get_machines(request):
-    """Returns the available queues that jobs can run on
+    """Returns the available machines that jobs can run on
 
     Keyword arguments:
     request - Django HttpRequest
     """
-    return ['localhost']
+    return [{"localhost": {}}]
 
 
 def view_queue(request, machine_name):
