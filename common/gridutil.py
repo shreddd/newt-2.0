@@ -127,4 +127,4 @@ def get_grid_path(machine, path):
     path = urllib.pathname2url(path)
     if not is_sanitized(path):
         raise ValueError("Bad Pathname")
-    return "gsiftp://" + hostname + "/" + path
+    return "gsiftp://" + hostname + path
