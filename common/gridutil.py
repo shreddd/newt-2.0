@@ -104,9 +104,8 @@ def get_cred_env(user):
         logger.error("No credentials found for user: %s" % user.username)
         raise Exception("No credentials found for user: %s" % user.username)
 
-    cred_path = '%s/%s%s' % (MYPROXY_CONFIG['PATH'], 
-                             MYPROXY_CONFIG['PREFIX'], 
-                             user.username)
+    cred_path = os.path.join(MYPROXY_CONFIG['PATH'], 
+                             MYPROXY_CONFIG['PREFIX'] + user.username)
     create_cert(cred_path, cred.cert + cred.key + cred.calist)
 
     env = os.environ.copy()
