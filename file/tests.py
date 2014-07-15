@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.conf import settings
 import json
 import os
-import random, string
+import random
 from newt.tests import MyTestClient, newt_base_url, login
 try:
     from newt.local_settings import test_machine as machine
@@ -34,20 +34,12 @@ class FileTests(TestCase):
         self.assertEquals(json_response['output'][1]['name'], "..")
         
     def test_getfile(self):
-        # TODO: Use namedtmpfile instead
-        tmpfile = "/tmp/tmp_newt.txt"
-        with open(tmpfile, 'w') as f:
-            f.write('hello newt')
-        # f.flush()
-        f.close()
         r = self.client.get(newt_base_url+'/file/'+machine+'/tmp/tmp_newt.txt?download=true')
         self.assertEquals(r.status_code, 200)
-
         self.assertEquals(r.streaming_content.next(), 'hello newt')
-        os.remove(tmpfile)
 
     def test_uploadfile(self):
-        rand_string = ''.join(random.choice(string.ascii_letters) for _ in xrange(10))
+        rand_string = '%010x' % random.randrange(16**10)
         r = self.client.put(newt_base_url + "/file/"+machine+"/tmp/tmp_newt_2.txt", data=rand_string)
         self.assertEqual(r.status_code, 200)
         json_response = r.json()
