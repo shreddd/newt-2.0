@@ -29,7 +29,7 @@ def download_path(request, machine_name, path):
     """
     src = gridutil.get_grid_path(machine_name, path)
     env = gridutil.get_cred_env(request.user)
-    dest = "/tmp/newt_"+request.username+"/"
+    dest = "/tmp/newt_"+request.user.username+"/"
     logger.debug("File download requested: %s (%s)" % (path, src))
     (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-url-copy %s %s" % (src, dest), env=env)
     if retcode != 0:
