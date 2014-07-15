@@ -21,25 +21,16 @@ class FileTests(TestCase):
         self.assertEquals(json_response['status'], "OK")
         self.assertIn(machine, json_response['output'])
         
-    def test_getdir(self):
-        file_list = os.listdir("/")
-        # Add . and .. to listdir results
-        file_list = file_list + ['.', '..']
-        file_list.sort()
-        self.assertTrue(len(file_list)>0)
-        
+    def test_getdir(self):        
         r = self.client.get(newt_base_url+'/file/'+machine+"/")
         self.assertEquals(r.status_code, 200)
 
         json_response = r.json()
         self.assertEquals(json_response['status'], "OK")
         
-        self.assertEquals(len(json_response['output']), len(file_list))
-        newt_file_list = [ str(line['name']) for line in json_response['output'] ]
-        newt_file_list.sort()
-        
-        self.maxDiff = None
-        self.assertEquals(newt_file_list, file_list)
+        self.assertTrue(len(json_response['output']) >= 2)
+        self.assertEquals(json_response['output'][0]['name'], ".")
+        self.assertEquals(json_response['output'][1]['name'], "..")
         
     def test_getfile(self):
         # TODO: Use namedtmpfile instead
