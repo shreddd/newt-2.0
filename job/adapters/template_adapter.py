@@ -46,20 +46,22 @@ def submit_job(request, machine_name):
     pass
 
 
-def get_info(machine_name, job_id):
+def get_info(request, machine_name, job_id):
     """Gets the information of a job, given the id
 
     Keyword arguments:
+    request -- Django HttpRequest
     machine_name -- name of the machine
     job_id -- the job id
     """
     pass
 
 
-def delete_job(machine_name, job_id):
+def delete_job(request, machine_name, job_id):
     """Gets the information of a job, given the id
 
     Keyword arguments:
+    request -- Django HttpRequest
     machine_name -- name of the machine
     job_id -- the job id
     """

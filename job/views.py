@@ -25,10 +25,10 @@ class JobQueueView(JSONRestView):
 # /api/jobs/<machine>/<job_id>/
 class JobDetailView(JSONRestView):
     def get(self, request, machine, job_id):
-        return job_adapter.get_info(machine, job_id)
+        return job_adapter.get_info(request, machine, job_id)
 
     def delete(self, request, machine, job_id):
-        return job_adapter.delete_job(machine, job_id)
+        return job_adapter.delete_job(request, machine, job_id)
 
 # /api/jobs/<query>/
 class ExtraJobView(JSONRestView):

@@ -68,17 +68,33 @@ def submit_job(request, machine_name):
     pass
 
 
-def get_info(machine_name, job_id):
+def get_info(request, machine_name, job_id):
     """Gets the information of a job, given the id
 
     Keyword arguments:
     machine_name -- name of the machine
     job_id -- the job id
     """
-    pass
+    machine = gridutil.GRID_RESOURCE_TABLE.get(machine_name, None)
+    if not machine:
+        return json_response(status="ERROR", status_code=400, error="Invalid machine name: %s" % machine_name)
+
+    env = gridutil.get_cred_env(request.user)
+    (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-job-run %s qs -w %s" % (machine['hostname'], job_id), env=env)
+    patt = re.compile(r'(?P<job_id>[^\s]+)\s+(?P<status>[^\s]+)\s+(?P<user>[^\s]+)\s+(?P<job_name>[^\s]+)\s+(?P<nodes>\d+)\s+(?P<walltime>[^\s]+)\s+(?P<time_use>[^\s]+)\s+(?P<time_submit>\w{3}\s\d{1,2}\s[\d\:]+)\s+(?P<rank>[^\s]+)\s+(?P<queue>[^\s]+)\s+(?P<q_state>[^\s]+)\s+(?P<processors>[^\s]+)\s+(?P<details>.*)$')
+
+    if retcode != 0:
+        return json_response(status="ERROR", status_code=500, error="Unable to get queue: %s" % error)
+    # filter out stuff that doesn't match pattern
+    output = filter(lambda line: patt.match(line), output)
+
+    # Convert output into dict from group names
+    output = map(lambda x: patt.match(x).groupdict(), output)[0]
+
+    return output
 
 
-def delete_job(machine_name, job_id):
+def delete_job(request, machine_name, job_id):
     """Gets the information of a job, given the id
 
     Keyword arguments:
