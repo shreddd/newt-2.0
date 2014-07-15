@@ -3,18 +3,23 @@ from django.conf import settings
 import json
 import os
 from newt.tests import MyTestClient, newt_base_url, login
+try:
+    from newt.local_settings import test_machine as machine
+except ImportError:
+    machine = "localhost"
 
 
 class FileTests(TestCase):
     def setUp(self):
         self.client = MyTestClient()
+        self.client.post(newt_base_url + "/auth", data=login)
 
     def test_root(self):
         r = self.client.get(newt_base_url+'/file')
         self.assertEquals(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['status'], "OK")
-        self.assertIn('localhost', json_response['output'])
+        self.assertIn(machine, json_response['output'])
         
     def test_getdir(self):
         file_list = os.listdir("/")
@@ -23,7 +28,7 @@ class FileTests(TestCase):
         file_list.sort()
         self.assertTrue(len(file_list)>0)
         
-        r = self.client.get(newt_base_url+'/file/localhost/')
+        r = self.client.get(newt_base_url+'/file/'+machine+"/")
         self.assertEquals(r.status_code, 200)
 
         json_response = r.json()
@@ -43,18 +48,18 @@ class FileTests(TestCase):
             f.write('hello newt')
         # f.flush()
         f.close()
-        r = self.client.get(newt_base_url+'/file/localhost/tmp/tmp_newt.txt?download=true')
+        r = self.client.get(newt_base_url+'/file/'+machine+'/tmp/tmp_newt.txt?download=true')
         self.assertEquals(r.status_code, 200)
 
         self.assertEquals(r.streaming_content.next(), 'hello newt')
         os.remove(tmpfile)
 
     def test_uploadfile(self):
-        r = self.client.put(newt_base_url + "/file/localhost/tmp/tmp_newt_2.txt", data="hello newt")
+        r = self.client.put(newt_base_url + "/file/"+machine+"/tmp/tmp_newt_2.txt", data="hello newt")
         self.assertEqual(r.status_code, 200)
         json_response = r.json()
         self.assertEquals(json_response['output']['location'], "/tmp/tmp_newt_2.txt")
-        r = self.client.get(newt_base_url+'/file/localhost/tmp/tmp_newt_2.txt?download=true')
+        r = self.client.get(newt_base_url+'/file/'+machine+'/tmp/tmp_newt_2.txt?download=true')
         self.assertEquals(r.status_code, 200)
         self.assertEquals(r.streaming_content.next(), 'hello newt')
         os.remove("/tmp/tmp_newt_2.txt")

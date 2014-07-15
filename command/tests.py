@@ -28,6 +28,7 @@ class CommandTests(TestCase):
         json_response = r.json()
         self.assertEquals(json_response['status'], "OK")
         self.assertIsNotNone(json_response['output']['output'])
+        self.assertEquals(json_response['output']['retcode'], 0)
 
     @skipIf(machine != "localhost", "Can't run ls on remote machine")
     def test_command_with_args(self):

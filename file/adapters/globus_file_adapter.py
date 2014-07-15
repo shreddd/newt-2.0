@@ -28,7 +28,7 @@ def download_path(request, machine_name, path):
     path -- path to file
     """
     src = gridutil.get_grid_path(path)
-    env = gridutil.get_globus_env(request.user)
+    env = gridutil.get_cred_env(request.user)
     dest = "/tmp/newt_"+request.user.name+"/"
     logger.debug("File download requested: %s (%s)" % (path, src))
     (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-url-copy %s %s" % (src, dest), env=env)
@@ -51,7 +51,7 @@ def put_file(request, machine, path):
     path -- path to file
     """
     # Get data from request body
-    data = request.raw_post_data
+    data = request.read()
     # Write data to temporary location
     # TODO: Get temporary path from settings.py 
     tmp_file = tempfile.NamedTemporaryFile(prefix="newt_")
@@ -59,8 +59,8 @@ def put_file(request, machine, path):
     tmp_file.file.flush()
 
     src = "file:///%s" % tmp_file.name
-    env = gridutil.get_globus_env(request.user)
-    dest = gridutil.get_grid_path(path)
+    env = gridutil.get_cred_env(request.user)
+    dest = gridutil.get_grid_path(machine, path)
 
     logger.debug("Putting file to location: %s" % dest)
 
@@ -79,7 +79,7 @@ def get_dir(request, machine_name, path):
     path -- path to file
     """
     try:
-        env = gridutil.get_globus_env(request.user)
+        env = gridutil.get_cred_env(request.user)
         output, error, ret_code = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/uberftp -ls %s" % path, 
                                               env=env)
         if retcode != 0:
