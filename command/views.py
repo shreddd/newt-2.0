@@ -14,7 +14,7 @@ logger = logging.getLogger("newt." + __name__)
 class CommandRootView(JSONRestView):
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
-        return command_adapter.get_systems()
+        return command_adapter.get_systems(request)
 
 # /api/command/<machine_name>/
 class CommandView(JSONRestView):
@@ -25,7 +25,7 @@ class CommandView(JSONRestView):
             return json_response(status="ERROR", 
                                  status_code=400, 
                                  error="No command received.")
-        return command_adapter.execute(machine_name, command)
+        return command_adapter.execute(request, machine_name, command)
 
 # /api/command/<query>/
 class ExtraCommandView(JSONRestView):

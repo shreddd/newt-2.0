@@ -17,7 +17,7 @@ import re
 logger = logging.getLogger("newt." + __name__)
 
 
-def execute(machine_name, command):
+def execute(request, machine_name, command):
     """Returns a the result of running command on machine_name
 
     Keyword arguments:
@@ -27,7 +27,7 @@ def execute(machine_name, command):
     pass
 
 
-def get_systems():
+def get_systems(request):
     """Returns a list of all machines available to run commands on
     """
     pass

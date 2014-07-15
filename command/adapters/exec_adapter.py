@@ -4,13 +4,13 @@ import logging
 logger = logging.getLogger("newt." + __name__)
 
 
-def execute(machine_name, command):
+def execute(request, machine_name, command):
     try:
         logger.debug("Running command: %s" % command)
         (output, error, retcode) = run_command(command)
         response = {
-            'stdout': output,
-            'stderr': error,
+            'output': output,
+            'error': error,
             'retcode': retcode
         }
         return response
@@ -19,7 +19,7 @@ def execute(machine_name, command):
         return json_response(error="Could not run command: %s" % str(e), status="ERROR", status_code=500)
 
 
-def get_systems():
+def get_systems(request):
     return ['localhost']
 
 patterns = (
