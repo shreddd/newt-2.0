@@ -44,7 +44,7 @@ def view_queue(request, machine_name):
         return json_response(status="ERROR", status_code=400, error="Invalid machine name: %s" % machine_name)
 
     env = gridutil.get_cred_env(request.user)
-    (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-job-run %s qs -w" % (machine['hostname']), env=env)
+    (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-job-run %s /usr/common/usg/bin/qs -w" % (machine['hostname']), env=env)
     patt = re.compile(r'(?P<job_id>[^\s]+)\s+(?P<status>[^\s]+)\s+(?P<user>[^\s]+)\s+(?P<job_name>[^\s]+)\s+(?P<nodes>\d+)\s+(?P<walltime>[^\s]+)\s+(?P<time_use>[^\s]+)\s+(?P<time_submit>\w{3}\s\d{1,2}\s[\d\:]+)\s+(?P<rank>[^\s]+)\s+(?P<queue>[^\s]+)\s+(?P<q_state>[^\s]+)\s+(?P<processors>[^\s]+)\s+(?P<details>.*)$')
 
     if retcode != 0:
