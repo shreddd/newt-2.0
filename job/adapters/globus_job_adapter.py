@@ -28,7 +28,7 @@ def get_machines(request):
     machines = []
     for (machine, attrs) in gridutil.GRID_RESOURCE_TABLE.iteritems():
         if attrs['jobmanagers'] != {}:
-            machines['machine'] = attrs['jobmanagers']
+            machines[machine] = attrs['jobmanagers']
     return machines
 
 
