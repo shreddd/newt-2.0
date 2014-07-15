@@ -13,7 +13,7 @@ logger = logging.getLogger("newt." + __name__)
 # /api/jobs
 class JobRootView(JSONRestView):
     def get(self, request):
-        return job_adapter.get_queues()
+        return job_adapter.get_machines(request)
 
 # /api/jobs/<machine>/
 class JobQueueView(JSONRestView):

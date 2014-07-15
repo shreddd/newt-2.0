@@ -9,7 +9,7 @@ from django.conf import settings
 from datetime import datetime
 import pytz
 
-def get_queues():
+def get_machines(request):
     """Returns the available queues that jobs can run on
 
     Keyword arguments:
