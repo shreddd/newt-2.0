@@ -30,18 +30,19 @@ def download_path(request, machine_name, path):
     """
     src = gridutil.get_grid_path(machine_name, path)
     env = gridutil.get_cred_env(request.user)
-    dest = "/tmp/newt_"+request.user.username+"/"
+    tmp_file = tempfile.NamedTemporaryFile(prefix="newt_")
+    dest = "file://"+tmp_file.name
     logger.debug("File download requested: %s (%s)" % (path, src))
     (output, error, retcode) = run_command(gridutil.GLOBUS_CONF['LOCATION'] + "bin/globus-url-copy %s %s" % (src, dest), env=env)
     if retcode != 0:
         logger.warning("Unable to download file: %s" % src)
         return json_response(content=output, status="ERROR", status_code=500, error=error)
-    filename = path.rsplit("/")[-1]
-    f = open(dest+"filename", "r")
-    mimetype = mimetypes.guess_type(f.name)
+    # filename = path.rsplit("/")[-1]
+    # f = open(dest+"filename", "r")
+    mimetype = mimetypes.guess_type(tmp_file.name)
     if mimetype is None:
         mimetype = "application/octet-stream"
-    return StreamingHttpResponse(f, content_type=mimetype)
+    return StreamingHttpResponse(tmp_file, content_type=mimetype)
 
 def put_file(request, machine, path):
     """Writes the uploaded file to path and returns the path
