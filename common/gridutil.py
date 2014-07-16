@@ -5,6 +5,7 @@ import re
 from auth.models import Cred
 import logging
 logger = logging.getLogger("newt." + __name__)
+from common.shell import run_command
 
 GRID_RESOURCE_TABLE = dict(
     genepool=dict(
@@ -81,6 +82,10 @@ GLOBUS_CONF = {
     "LIB_PATH": "/global/common/datatran/dsg/globus-5.0.4/lib/"
 }
 
+SGE_EXECD_PORT = "537"
+SGE_QMASTER_PORT = "536"
+SGE_ROOT = "/common/nsg/sge/ge-8.1.2"
+
 def is_sanitized(input):
     return not re.search(r'[^ a-zA-Z0-9!@#%^_+:./-]', input)
 
@@ -128,3 +133,20 @@ def get_grid_path(machine, path):
     if not is_sanitized(path):
         raise ValueError("Bad Pathname")
     return "gsiftp://" + hostname + path
+
+class GlobusHelper:
+    GLOBUS_JOB_RUN_BIN = GLOBUS_CONF['LOCATION'] + "/bin/globus-job-run"
+
+    @classmethod
+    def get_globus_env(cls, user):
+        return get_cred_env(user)
+
+    def __init__(self, user):
+        if not user.is_authenticated():
+            raise Exception("User must be logged in")
+        self.user = user
+        self.env = self.get_globus_env(self.user)
+
+    def run_job(self, command, host, flags=""):
+        cmd_str = self.GLOBUS_JOB_RUN_BIN + " %s %s %s" % (host, flags, command)
+        return run_command(cmd_str, env=self.env)

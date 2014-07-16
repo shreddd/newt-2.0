@@ -16,7 +16,9 @@ import logging
 import re
 logger = logging.getLogger("newt." + __name__)
 from common import gridutil
+from common.gridutil import GlobusHelper
 from common.shell import run_command
+import tempfile
 
 
 def get_machines(request):
@@ -67,7 +69,58 @@ def submit_job(request, machine_name):
     request -- Django HttpRequest
     machine_name -- name of the machine
     """
-    pass
+     machine = gridutil.GRID_RESOURCE_TABLE.get(machine_name, None)
+    if not machine:
+        return json_response(status="ERROR", status_code=400, error="Invalid machine name: %s" % machine_name)
+
+    flags = ""
+    jobmanager = machine['jobmanagers']['fork']['url']
+    qsub = machine['qsub']['bin']
+    scheduler = machine['qsub']['scheduler']
+
+    # Set environment flags for qsub
+    if scheduler == "sge":
+        sge_env_str = "-env SGE_ROOT=%s -env SGE_QMASTER_PORT=%s -env SGE_EXECD_PORT=%s" % (gridutil.SGE_ROOT, gridutil.SGE_QMASTER_PORT, gridutil.SGE_EXECD_PORT)
+        flags += " " + sge_env_str
+
+    if request.POST.get("jobfile", False):
+        # Create command for qsub on an existing pbs file
+        job_file_path = request.POST.get("jobfile")
+        cmd = "%s %s" % (qsub, job_file_path)
+    elif request.POST.get("jobscript", False):
+        # Create command for qsub from stdin data
+        job_script = request.POST.get("jobscript")
+
+        # Creates a temporary job file
+        tmp_job_file = tempfile.NamedTemporaryFile(prefix="newt_")
+        tmp_job_file.write(job_script)
+        tmp_job_file.flush()
+
+        # Stages the temporary job file and pass it as to stdin to qsub
+        flags += " -stdin -s %s" % tmp_job_file.name
+        cmd = qsub
+    else:
+        return json_response(status="ERROR", 
+                             status_code=400, 
+                             error="No data received")
+
+    runner = GlobusHelper(request.user)
+
+    if scheduler != "sge":
+        cmd = '/bin/bash -l -c "%s"' % cmd
+    try:
+        (output, error, retcode) = runner.run_job(cmd, jobmanagers, flags)
+    except Exception, ex:
+        return json_response(status="ERROR", 
+                             status_code=500, 
+                             error="qsub failed with error: %s" % str(ex))
+    if retcode != 0:
+        return json_response(status="ERROR", 
+                             status_code=500, 
+                             error="qsub failed with error: %s" % error)
+    return output
+
+
 
 
 def get_info(request, machine_name, job_id):
