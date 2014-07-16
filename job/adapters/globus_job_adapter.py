@@ -109,7 +109,7 @@ def submit_job(request, machine_name):
 
     try:
         runner = GlobusHelper(request.user)
-        (output, error, retcode) = runner.run_job(cmd, jobmanagers, flags)
+        (output, error, retcode) = runner.run_job(cmd, jobmanager, flags)
     except Exception, ex:
         return json_response(status="ERROR", 
                              status_code=500, 
@@ -118,7 +118,7 @@ def submit_job(request, machine_name):
         return json_response(status="ERROR", 
                              status_code=500, 
                              error="qsub failed with error: %s" % error)
-    return output
+    return {"jobid":output.strip()}
 
 
 def get_info(request, machine_name, job_id):
