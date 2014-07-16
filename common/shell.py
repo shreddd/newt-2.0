@@ -10,7 +10,7 @@ from django.utils.encoding import smart_str
 
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt."+__name__)
 
 
 class Alarm(Exception):

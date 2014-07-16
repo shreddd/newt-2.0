@@ -2,88 +2,71 @@ from newt.views import JSONRestView
 from common.response import json_response
 from django.conf import settings
 import json
+from importlib import import_module
 
-store_adapter = __import__(settings.NEWT_CONFIG['ADAPTERS']['STORES'], globals(), locals(), ['adapter'], -1)
+store_adapter = import_module(settings.NEWT_CONFIG['ADAPTERS']['STORES']['adapter'])
 
 import logging
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("newt." + __name__)
 
+# /api/stores/
 class StoresRootView(JSONRestView):
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
-        return store_adapter.get_stores()
+        return store_adapter.get_stores(request)
 
     def post(self, request):
-        # Temporary: creates a store with a random name if no name is specified
-        import uuid
-        import random
-        import string
+        logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
+        initial_data = request.POST.getlist("data")
+        return store_adapter.create_store(request, initial_data=initial_data)
 
-        rand_key = random.choice(string.ascii_letters) + str(uuid.uuid4())[0:8]
-        while(rand_key in store_adapter.get_stores()):
-            rand_key = str(uuid.uuid4())[0:8]
-
-        if request.POST.get("data", False):
-            return store_adapter.create_store(request, rand_key, [request.POST.get("data")])
-        else:
-            return store_adapter.create_store(request, rand_key)
-
-
+# /api/stores/<store_name>/
 class StoresView(JSONRestView):
     def get(self, request, store_name):
-        try:
-            if request.GET.get("query", False):
-                data = store_adapter.query_store(store_name, request.GET.get("query"))
-            else:
-                data = store_adapter.get_store_contents(store_name)
-        except Exception as e:
-            logger.error("Invalid store requested: %s", store_name)
-            return json_response(status="ERROR", status_code=500, error=e.args[0])
-        return data
+        if request.GET.get("query", False):
+            # Queries the store if the query parameter is set
+            return store_adapter.query_store(request, store_name, request.GET.get("query"))
+        else:
+            # Returns all data about the store
+            return store_adapter.get_store_contents(request, store_name)
 
     def post(self, request, store_name):
-        if store_name in store_adapter.get_stores():
-            if request.POST.get("data", False):
-                data = request.POST.get("data")
-                return store_adapter.store_insert(store_name, data)
-            else:
-                return json_response(status="ERROR", status_code=500, error="No data recieved.")
-        else:
-            if request.POST.get("data", False):
-                return store_adapter.create_store(request, store_name, [request.POST.get("data")])
-            else:
-                return store_adapter.create_store(request, store_name)
 
-    def put(self, request, store_name):
-        data = json.loads(request.read())
-        store_adapter.update(store_name, data)
+        if store_name in store_adapter.get_stores(request):
+            # Updates data if the store already exists
+            initial_data = request.POST.get("data", None)
+            return store_adapter.store_insert(request, store_name, initial_data=initial_data)
+        else:
+            # Creates and adds the data if the store doesn't exist
+            initial_data = request.POST.getlist("data")
+            return store_adapter.create_store(request, store_name, initial_data=initial_data)
 
     def delete(self, request, store_name):
-        return store_adapter.delete_store(store_name)
+        return store_adapter.delete_store(request, store_name)
 
+# /api/stores/<store_name>/perms/
 class StoresPermView(JSONRestView):
     def get(self, request, store_name):
-        return store_adapter.get_store_perms(store_name)
+        return store_adapter.get_store_perms(request, store_name)
 
     def post(self, request, store_name):
-        new_perms = json.loads(request.POST['data'])
-        return store_adapter.update_store_perms(store_name, new_perms)
+        perms = json.loads(request.POST.get("data", "[]"))
+        return store_adapter.update_store_perms(request, store_name, perms=perms)
 
-
+# /api/stores/<store_name>/<obj_id>/
 class StoresObjView(JSONRestView):
     def get(self, request, store_name, obj_id):
-        try:
-            return store_adapter.store_get_obj(store_name, obj_id)
-        except Exception as e:
-            return json_response(status="ERROR", status_code="500", error=e.args[0])
+        return store_adapter.store_get_obj(request, store_name, obj_id)
 
     def put(self, request, store_name, obj_id):
-        from django.http import QueryDict
-        body = QueryDict(request.body)
-        if body.get("data", False):
-            data = body.get("data")
-            return store_adapter.store_update(store_name, obj_id, data)
-        else:
-            return json_response(status="ERROR", status_code=500, error="No data recieved.")
+        data = json.loads(request.body).get("data", None)
+        if not data:
+            return json_response(status="ERROR", status_code=400, error="No data received.")
+        return store_adapter.store_update(request, store_name, obj_id, data=data)
+
+# /api/stores/<query>/
+class ExtraStoresView(JSONRestView):
+    def get(self, request, query):
+        return acct_adapter.extras_router(request, query)

@@ -6,6 +6,7 @@ from django.conf import settings
 import socket
 import re
 from OpenSSL import crypto, SSL
+from auth.models import Cred
 
 logger = logging.getLogger(__name__)
 
@@ -205,17 +206,6 @@ def myproxy_logon(hostname,username,passphrase,outfile,lifetime=43200,port=7512)
 
 
 
-class Cred:
-    def __init__(self, cert, key, calist=None):
-        self.cert = cert
-        self.key = key
-        self.calist = calist
-  
-    def __unicode__(self):
-        return self.cert
-  
-
-
 class MyProxyBackend:
     
     def authenticate(self, username=None, password=None, request=None):
@@ -228,7 +218,6 @@ class MyProxyBackend:
         except Exception, e:
             logger.debug("MyProxy Exception: %s" % e)            
             return None
-
         if credentials == None:
             return None
 
@@ -236,7 +225,7 @@ class MyProxyBackend:
             myuser = User.objects.get(username=username)
         except ObjectDoesNotExist:
             # This isn't actually used anywhere, but you might make this smarter
-            email = "%s@%s" % (username, settings['NEWT_DOMAIN'])
+            email = "%s@%s" % (username, settings.NEWT_DOMAIN)
             try:
                 myuser = User.objects.create_user(username, email)
             except Exception,ex:
@@ -244,10 +233,12 @@ class MyProxyBackend:
                 raise ex
 
         mycred = Cred(cert=credentials['cert'], key=credentials['key'], calist=''.join(credentials['calist']), user=myuser)
+        mycred.save()
 
         # If we have a request object save the credential in the session
         if request:
-            request.session.__setitem__("cred", mycred)
+            request.session["cred"] = mycred
+        myuser.backend = 'django.contrib.auth.backends.ModelBackend'
         return myuser
   
     def get_user(self, user_id):

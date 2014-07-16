@@ -1,0 +1,28 @@
+[
+    {
+        "pk": 2, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "nimonly", 
+            "first_name": "", 
+            "last_name": "", 
+            "is_active": true, 
+            "is_superuser": false, 
+            "is_staff": false, 
+            "last_login": "2014-02-08T01:24:38Z", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "pbkdf2_sha256$12000$2zMkWDXNBhum$8bVlNsEcnHa2RGyuh7ZuMz+nJhnpLQ2JyelBSwClOc4=", 
+            "email": "", 
+            "date_joined": "2014-02-08T01:24:38Z"
+        }
+    },
+    {
+        "pk": 1, 
+        "model": "auth.group", 
+        "fields": {
+            "name": "Test Group", 
+            "permissions": []
+        }
+    }
+]
