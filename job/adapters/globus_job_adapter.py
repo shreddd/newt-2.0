@@ -176,7 +176,7 @@ def delete_job(request, machine_name, job_id):
 
     try:
         runner = GlobusHelper(request.user)
-        (output, error, retcode) = runner.run_job(cmd, jobmanagers, flags)
+        (output, error, retcode) = runner.run_job(cmd, jobmanager, flags)
     except Exception, ex:
         return json_response(status="ERROR", 
                              status_code=500, 
