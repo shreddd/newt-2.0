@@ -69,7 +69,7 @@ def submit_job(request, machine_name):
     request -- Django HttpRequest
     machine_name -- name of the machine
     """
-     machine = gridutil.GRID_RESOURCE_TABLE.get(machine_name, None)
+    machine = gridutil.GRID_RESOURCE_TABLE.get(machine_name, None)
     if not machine:
         return json_response(status="ERROR", status_code=400, error="Invalid machine name: %s" % machine_name)
 
@@ -104,11 +104,11 @@ def submit_job(request, machine_name):
                              status_code=400, 
                              error="No data received")
 
-    runner = GlobusHelper(request.user)
-
     if scheduler != "sge":
         cmd = '/bin/bash -l -c "%s"' % cmd
+
     try:
+        runner = GlobusHelper(request.user)
         (output, error, retcode) = runner.run_job(cmd, jobmanagers, flags)
     except Exception, ex:
         return json_response(status="ERROR", 
@@ -119,8 +119,6 @@ def submit_job(request, machine_name):
                              status_code=500, 
                              error="qsub failed with error: %s" % error)
     return output
-
-
 
 
 def get_info(request, machine_name, job_id):
@@ -158,7 +156,36 @@ def delete_job(request, machine_name, job_id):
     machine_name -- name of the machine
     job_id -- the job id
     """
-    pass
+    machine = gridutil.GRID_RESOURCE_TABLE.get(machine_name, None)
+    if not machine:
+        return json_response(status="ERROR", status_code=400, error="Invalid machine name: %s" % machine_name)
+
+    flags = ""
+    jobmanager = machine['jobmanagers']['fork']['url']
+    qdel = machine['qdel']['bin']
+    scheduler = machine['qdel']['scheduler']
+    cmd = "%s %s" % (qdel, job_id)
+
+    # Set environment flags for qsub
+    if scheduler == "sge":
+        sge_env_str = "-env SGE_ROOT=%s -env SGE_QMASTER_PORT=%s -env SGE_EXECD_PORT=%s" % (gridutil.SGE_ROOT, gridutil.SGE_QMASTER_PORT, gridutil.SGE_EXECD_PORT)
+        flags += " " + sge_env_str
+
+    if scheduler != "sge":
+        cmd = '/bin/bash -l -c "%s"' % cmd
+
+    try:
+        runner = GlobusHelper(request.user)
+        (output, error, retcode) = runner.run_job(cmd, jobmanagers, flags)
+    except Exception, ex:
+        return json_response(status="ERROR", 
+                             status_code=500, 
+                             error="qsub failed with error: %s" % str(ex))
+    if retcode != 0:
+        return json_response(status="ERROR", 
+                             status_code=500, 
+                             error="qsub failed with error: %s" % error)
+    return output
 
 
 """A tuple list in the form of:
