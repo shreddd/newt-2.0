@@ -15,7 +15,7 @@ def get_machines(request):
     Keyword arguments:
     request - Django HttpRequest
     """
-    return [{"localhost": {}}]
+    return {"localhost": {}}
 
 
 def view_queue(request, machine_name):
