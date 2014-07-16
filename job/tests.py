@@ -29,7 +29,7 @@ class JobTests(TestCase):
     def test_running_cmds(self):
         # Tests submitting a job
         payload = {
-            "jobscript": "sleep 5"
+            "jobscript": "/bin/hostname\nsleep 10"
         }
         r = self.client.post(newt_base_url + "/job/"+machine+"/", data=payload)
         self.assertEquals(r.status_code, 200)
@@ -49,26 +49,3 @@ class JobTests(TestCase):
         # Delete job from queue
         r = self.client.delete(newt_base_url + "/job/"+machine+"/%s/" % job_id)
         self.assertEquals(r.status_code, 200)
-
-    # def test_short_cmd(self):
-    #     payload = {
-    #         "jobscript": "ls -a /"
-    #     }
-    #     r = self.client.post(newt_base_url + "/job/"+machine+"/", data=payload)
-    #     self.assertEquals(r.status_code, 200)
-    #     json_response = r.json()
-    #     self.assertIsNot(json_response['output']['jobid'], None)
-    #     job_id = json_response['output']['jobid']
-
-    #     time.sleep(1)
-
-    #     r = self.client.get(newt_base_url + "/job/"+machine+"/%s/" % job_id)
-    #     self.assertEquals(r.status_code, 200)
-    #     json_response = r.json()
-    #     self.assertEquals(json_response['output']['jobid'], job_id)
-    #     self.assertEquals(json_response['output']['user'], login['username'])
-    #     self.assertEquals(json_response['output']['status'], '0')
-    #     files = ['.', '..'] + os.listdir("/")
-    #     files.sort()
-    #     cmd_out = json_response['output']['output'].splitlines()
-    #     self.assertEquals(files, cmd_out)
