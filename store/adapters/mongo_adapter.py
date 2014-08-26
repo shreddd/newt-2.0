@@ -1,7 +1,7 @@
 """Mongo Adapter for NEWT 
 
 Structure:
-    - Database Name: stores
+    - Database Name: store
     - Each new store is a new collection in the database 
     - Each object in the collection is stored as:
         {
@@ -29,13 +29,13 @@ from django.http import QueryDict
 import logging
 logger = logging.getLogger("newt." + __name__)
 
-def get_stores(request):
+def get_store(request):
     """Returns a list of available store names.
 
     Keyword arguments:
     request -- Django HttpRequest object
     """
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     return filter(lambda s: s!="system.indexes", db.collection_names())
 
 def create_store(request, store_name=None, initial_data=[]):
@@ -57,13 +57,13 @@ def create_store(request, store_name=None, initial_data=[]):
     # Check that store name is unique (or create unique identifier)
     if not store_name:
         store_name = random.choice(string.ascii_letters) + str(uuid.uuid4())[0:8]
-        while(store_name in get_stores(request)):
+        while(store_name in get_store(request)):
             store_name = str(uuid.uuid4())[0:8]
-    elif store_name in get_stores(request):
+    elif store_name in get_store(request):
         return json_response(status="ERROR", status_code=400, error="Store name already exists.")
     
     # Create new collection
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     new_collection = db.create_collection(store_name)
     
     # Load initial data into the store
@@ -99,7 +99,7 @@ def get_store_contents(request, store_name):
     store_name -- the name of the store
     """
     # Check existance of the store
-    if store_name not in get_stores(request):
+    if store_name not in get_store(request):
         return json_response(status="ERROR", 
                              status_code=404, 
                              error="Store does not exist: %s" % store_name)
@@ -107,7 +107,7 @@ def get_store_contents(request, store_name):
     # Check privlages of user attempting to access store
 
     # Get and return contents of the store
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     store = db[store_name]
     return [{"oid": x["oid"], "data": x['data']} for x in store.find({}, {"_id":0, "data":1, "oid":1})]
 
@@ -137,7 +137,7 @@ def store_get_obj(request, store_name, obj_id):
     obj_id -- ID of the object in the store
     """
     # Gets the value of the key in the store
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     store = db[store_name]
     obj = store.find_one({"oid":obj_id},{"_id":0, "data":1})
     if obj:
@@ -163,7 +163,7 @@ def store_insert(request, store_name, initial_data):
         return json_response(status="ERROR", status_code=400, error="No data received.")
 
     # Insert the key value pairs into the store
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     store = db[store_name]
     oid = str(store.count())
     store.insert({"oid": oid, "data": data})
@@ -180,7 +180,7 @@ def store_update(request, store_name, obj_id, data):
     data -- Updated data of the document
     """
     # Set the key of the store to the new value
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     store = db[store_name]
     store.update({"oid":obj_id},{"$set":{"data": data}})
     return str(obj_id)
@@ -203,7 +203,7 @@ def get_store_perms(request, store_name):
     store_name -- the name of the store
     """
     # Return the permissions of the store
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     store = db["permissions"]
     res = store.find_one({"name":store_name}, {"_id":0})
     if res:
@@ -228,7 +228,7 @@ def update_store_perms(request, store_name, perms):
         ]
     """
     # Updates the permissions of the store and returns the status
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     perm_col = db['permissions']
     for new_perm in perms:
         # Remove original permission
@@ -247,7 +247,7 @@ def delete_store(request, store_name):
     # Check privlages of user attempting to delete store
     # Delete store
     # Return the status/output of the operation
-    db = MongoClient()['stores']
+    db = MongoClient()['store']
     store = db[store_name]
     store.drop()
     perms = db['permissions']

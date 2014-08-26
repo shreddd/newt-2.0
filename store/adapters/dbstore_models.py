@@ -7,7 +7,7 @@ class Store(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        app_label = 'stores'
+        app_label = 'store'
 
 @receiver(pre_delete, sender=Store)
 def pre_store_rm(sender, instance, using, **kwargs):
@@ -21,7 +21,7 @@ class Document(models.Model):
     store = models.ForeignKey(Store, related_name="documents")
 
     class Meta:
-        app_label = 'stores'
+        app_label = 'store'
 
 class Permission(models.Model):
     user = models.ForeignKey(User, related_name="store_perms")
@@ -29,4 +29,4 @@ class Permission(models.Model):
     type = models.CharField(max_length=100, default="r")
 
     class Meta:
-        app_label = 'stores'
+        app_label = 'store'

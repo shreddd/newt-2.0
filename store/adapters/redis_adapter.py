@@ -1,7 +1,7 @@
 """
     Database Structure:
 
-        "stores" - A list of all of the stores in the database
+        "store" - A list of all of the store in the database
 
         For every store: 
             <store_name>:docs - A list of all of the documents within the store
@@ -27,14 +27,14 @@ import random, string, uuid
 STOREDB = 0
 HOST = "localhost"
 
-def get_stores(request):
+def get_store(request):
     """Returns a list of available store names.
 
     Keyword arguments:
     request -- Django HttpRequest object
     """
     storedb = redis.Redis(host=HOST, db=STOREDB)
-    return storedb.lrange("stores",0,-1)
+    return storedb.lrange("store",0,-1)
 
 def create_store(request, store_name=None, initial_data=[]):
     """Creates a store with the given store_name and initial_data; Returns a 
@@ -57,9 +57,9 @@ def create_store(request, store_name=None, initial_data=[]):
     
     if not store_name:
         store_name = random.choice(string.ascii_letters) + str(uuid.uuid4())[0:8]
-        while(store_name in get_stores(request)):
+        while(store_name in get_store(request)):
             store_name = str(uuid.uuid4())[0:8]
-    elif store_name in get_stores(request):
+    elif store_name in get_store(request):
         return json_response(status="ERROR", status_code=400, error="Store name already exists.")
     
     oid_list = []
@@ -69,7 +69,7 @@ def create_store(request, store_name=None, initial_data=[]):
         storedb.rpush(store_name + ":docs", dbname)
         oid_list.append(str(oid))
 
-    storedb.rpush("stores", store_name)
+    storedb.rpush("store", store_name)
     storedb.rpush(store_name + ":perms", store_name + ":perms:" + request.user.username)
 
     #set initial perms to read and write
@@ -95,7 +95,7 @@ def get_store_contents(request, store_name):
     store_name -- the name of the store
     """
     storedb = redis.Redis(host=HOST, db=STOREDB)
-    if store_name not in get_stores(request):
+    if store_name not in get_store(request):
         return json_response(status="ERROR", status_code=404, error="Store does not exist.")    
     store_docs = storedb.lrange(store_name + ":docs",0,-1)
     store_contents = []
@@ -121,7 +121,7 @@ def query_store(request, store_name, query):
     store_name -- the name of the store
     query -- a query string
     """
-    if store_name not in get_stores(request):
+    if store_name not in get_store(request):
         return json_response(status="ERROR", status_code=404, error="Store does not exist.")    
     return json_response(status="ERROR", status_code=501, error="Method not implemented.")
     # return storedb.get(storedb+":"+query)
@@ -136,7 +136,7 @@ def store_get_obj(request, store_name, obj_id):
     """
     storedb = redis.Redis(host=HOST, db = STOREDB)
     
-    if store_name not in get_stores(request):
+    if store_name not in get_store(request):
         return json_response(status="ERROR", status_code=404, error="Store does not exist.")    
     
     return storedb.get(store_name + ":" + obj_id)
@@ -177,7 +177,7 @@ def store_update(request, store_name, obj_id, data):
     """
     storedb = redis.Redis(host=HOST, db=STOREDB)
 
-    if store_name not in get_stores(request):
+    if store_name not in get_store(request):
         return json_response(status="ERROR", status_code=404, error="Store does not exist.")    
     
     # Get data from PUT request
@@ -204,7 +204,7 @@ def get_store_perms(request, store_name):
     store_name -- the name of the store
     """
     storedb = redis.Redis(host=HOST, db=STOREDB)
-    if store_name not in get_stores(request):
+    if store_name not in get_store(request):
         return json_response(status="ERROR", status_code=404, error="Store does not exist.")    
     
     all_perm_entries = storedb.lrange(store_name+":perms", 0, -1)
@@ -235,7 +235,7 @@ def update_store_perms(request, store_name, perms):
         ]
     """
     storedb = redis.Redis(host=HOST, db=STOREDB)
-    if store_name not in get_stores(request):
+    if store_name not in get_store(request):
         return json_response(status="ERROR", status_code=404, error="Store does not exist.")    
     
     new_perms = []
@@ -264,7 +264,7 @@ def delete_store(request, store_name):
 
     storedb = redis.Redis(host=HOST, db=STOREDB)
 
-    if store_name not in get_stores(request):
+    if store_name not in get_store(request):
         return {"msg": store_name + " does not exist in the database"}
     
 
@@ -278,7 +278,7 @@ def delete_store(request, store_name):
 
     storedb.delete(store_name + ":docs")
     storedb.delete(store_name + ":perms")
-    storedb.lrem("stores", store_name, 1)
+    storedb.lrem("store", store_name, 1)
 
     # Returns message indicating the successful deletion
     return store_name

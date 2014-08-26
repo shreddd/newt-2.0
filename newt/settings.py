@@ -134,7 +134,7 @@ INSTALLED_APPS = (
     'auth',
     'status',
     'file',
-    'stores',
+    'store',
     'account',
     'job',
     # Uncomment the next line to enable the admin:
@@ -264,8 +264,8 @@ NEWT_CONFIG = {
             'models': "",
         },
         'STORES': {
-            'adapter': 'stores.adapters.dbstore_adapter',
-            'models': "stores.adapters.dbstore_models",
+            'adapter': 'store.adapters.dbstore_adapter',
+            'models': "store.adapters.dbstore_models",
         },
         'ACCOUNT': {
             'adapter': 'account.adapters.django_adapter',
