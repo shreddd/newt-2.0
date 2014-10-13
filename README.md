@@ -77,13 +77,17 @@ def get_user_info(user_name, uid):
         return user_dict
     except Exception:
         if user_name:
-            return json_response(status="ERROR", 
-                                 status_code=404, 
-                                 error="User not found: No user has the username %s" % user_name)
+            return json_response(
+                status="ERROR", 
+                status_code=404, 
+                error="User not found: %s" % user_name
+            )
         else:
-            return json_response(status="ERROR", 
-                                 status_code=404, 
-                                 error="User not found: No user has the id %s" % uid)
+            return json_response(
+                status="ERROR", 
+                status_code=404, 
+                error="User ID not found: %s" % uid
+            )
 ```
 **Note**: This is only one of the two required functions in the adapter; a full example can be seen in `account/adapters/django_adapter.py`.
 
