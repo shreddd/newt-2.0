@@ -212,7 +212,7 @@ LOGGING = {
 }
 
 # Base NEWT Settings
-NEWT_VERSION = '0.5.0'
+NEWT_VERSION = '2.0.0'
 NEWT_HOST = 'localhost'
 NEWT_DOMAIN = 'nersc.gov'
 NEWT_COOKIE_LIFETIME=43200
@@ -232,18 +232,8 @@ ALLOWED_CIDRS = [ '128.3.0.0/16', '131.243.0.0/16', '128.55.0.0/16', '198.128.0.
 # Allow specific hostnames not included in ALLOWED_CIDRS
 ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', 'petstore.swagger.wordnik.com' ]
 
-
-# NEWT Status API
-STATUS_URL = 'http://www.nersc.gov/REST/status/status_newt.php'
-
 NEWT_CONFIG = {
     'SYSTEMS': [
-        {'NAME': 'hopper', 'HOSTNAME': 'hoppergrid.nersc.gov' },
-        {'NAME': 'edison', 'HOSTNAME': 'edisongrid.nersc.gov' },
-        {'NAME': 'carver', 'HOSTNAME': 'carvergrid.nersc.gov' },
-        {'NAME': 'pdsf', 'HOSTNAME': 'pdsfgrid.nersc.gov' },
-        {'NAME': 'dtn', 'HOSTNAME': 'dtn01.nersc.gov' },
-        {'NAME': 'archive', 'HOSTNAME': 'garchive.nersc.gov' },
         {'NAME': 'localhost', 'HOSTNAME': 'localhost' },
     ],
     'ADAPTERS': {
@@ -276,7 +266,6 @@ NEWT_CONFIG = {
             'models': "",
         },
     },
-    'NIM_BASE_URL': 'http://nimprod.nersc.gov:8004',
 }
 
 try:
