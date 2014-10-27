@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import Http404, HttpResponseServerError, HttpResponse
 from common.response import json_response
 
-nim_base_url = settings.NEWT_CONFIG['NIM_BASE_URL']
+nim_base_url = 'http://nimprod.nersc.gov:8004'
 
 def get_user_info(user_name=None, uid=None):
     if uid:
