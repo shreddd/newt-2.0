@@ -19,6 +19,7 @@ NEWT 2.0 is shipped with a local implementation of each of its different modules
 ##Runtime Requirements
 - python 2.7.* (https://www.python.org/downloads/)
 - pip (http://pip.readthedocs.org/en/latest/installing.html#install-pip)
+- libmagic
 
 ##Python Package Dependencies
 With pip: `pip install -r requirements.txt`. 
