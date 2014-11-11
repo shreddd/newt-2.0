@@ -1,6 +1,4 @@
-"""Store Adapter Template File
-
-IMPORTANT: NOT A FUNCTIONAL ADAPTER. FUNCTIONS MUST BE IMPLEMENTED
+""" Django ORM based store.
 
 Notes:
     - Each of the functions defined below must return a json serializable

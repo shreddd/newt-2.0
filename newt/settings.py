@@ -230,7 +230,7 @@ XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE', 'HEAD']
 # ALLOWED Networks for cross domain stuff
 ALLOWED_CIDRS = [ '128.3.0.0/16', '131.243.0.0/16', '128.55.0.0/16', '198.128.0.0/14' ]
 # Allow specific hostnames not included in ALLOWED_CIDRS
-ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', 'petstore.swagger.wordnik.com' ]
+ALLOWED_HOSTS = [ 'localhost', '127.0.0.1' ]
 
 NEWT_CONFIG = {
     'SYSTEMS': [
@@ -239,31 +239,31 @@ NEWT_CONFIG = {
     'ADAPTERS': {
         'STATUS': {
             'adapter': 'status.adapters.ping_adapter',
-            'models': "",
+            'models': '',
         },
         'FILE': {
             'adapter': 'file.adapters.localfile_adapter',
             'models': "",
         }, 
         'AUTH': {
-            'adapter': 'auth.adapters.myproxy_adapter',
-            'models': "auth.adapters.myproxy_models",
+            'adapter': 'auth.adapters.dbauth_adapter',
+            'models': '',
         },
         'COMMAND': {
             'adapter': 'command.adapters.exec_adapter',
-            'models': "",
+            'models': '',
         },
         'STORES': {
             'adapter': 'store.adapters.dbstore_adapter',
-            'models': "store.adapters.dbstore_models",
+            'models': 'store.adapters.dbstore_models',
         },
         'ACCOUNT': {
             'adapter': 'account.adapters.django_adapter',
-            'models': "",
+            'models': '',
         },
         'JOB': {
             'adapter': 'job.adapters.unix_adapter',
-            'models': "",
+            'models': '',
         },
     },
 }

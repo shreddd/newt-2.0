@@ -20,6 +20,7 @@ NEWT 2.0 is shipped with a local implementation of each of its different modules
 - python 2.7.* (https://www.python.org/downloads/)
 - pip (http://pip.readthedocs.org/en/latest/installing.html#install-pip)
 - libmagic
+- sqlite (or other database for Django)
 
 ##Python Package Dependencies
 With pip: `pip install -r requirements.txt`. 
@@ -120,6 +121,40 @@ patterns = (
     (re.compile(r'/(?P<path>.+)$'), get_resource, False),
 )
 ```
+
+##Models
+Some adapters may need to store application specific state in the Django database.
+In this case you can define a Django model (see https://docs.djangoproject.com/en/1.6/topics/db/models/). You should use place your models file in the adapters/ directory 
+and set the `NEWT_CONFIG['ADAPTERS'][application]['models']` to point to this in settings.py 
+
+
+For example this is how you would get Django to store a credential object in the auth adapter. Note that you need to specify the app_label in the `Meta` section of your model to point to the parent application
+
+auth/adapters/my_models.py:
+```python
+from django.db import models
+from django.contrib.auth.models import User
+
+class Cred(models.Model):
+    class Meta:
+        app_label = 'auth'
+    cred = models.TextField()
+    user = models.ForeignKey(User)
+
+```
+
+settings.py:
+```python
+NEWT_CONFIG = {
+    
+    'ADAPTERS': {
+
+        'AUTH': {
+            'adapter': 'auth.adapters.my_adapter',
+            'models': 'auth.adapters.my_models',
+        },
+```
+
 
 #Contributors to NEWT 2.0
 - [Shreyas Cholia](https://github.com/shreddd)
