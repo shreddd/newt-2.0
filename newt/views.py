@@ -60,25 +60,4 @@ class RootView(JSONRestView):
 
 
         
-class DocView(View):
-    """
-    Implements a Swagger API doc
-    http://swagger.wordnik.com/
-
-    Don't go through the JSONRestView for this, because it has to comply with the swagger format
-    """
-    
-    def get(self, request, path=None):
-        base_path = os.path.join(settings.PROJECT_DIR, "newt", "api-docs")
-        filename = "index.json"
-        if path==None:
-            doc = os.path.join(base_path, filename)
-        else:
-            doc = os.path.join(base_path, path, filename)
-            
-        with open(doc) as doc_file:
-            response = doc_file.read()
-        # Don't go through the JSONRestView for this, because it has to comply with the swagger format  
-        return HttpResponse(response, content_type='application/json')
-        
         
