@@ -179,7 +179,7 @@ class StoreView(AuthJSONRestView):
 
 ```
 
-#### 2. Authenticate a specific adpater function
+#### 2. Authenticate a specific adapter function
 Inside your adapter you can use the login_required decorator to force authentication on a specific function
 eg. in file/adapters/globus_file_adapter.py
 ```python
