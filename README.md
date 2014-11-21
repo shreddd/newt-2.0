@@ -157,7 +157,7 @@ NEWT_CONFIG = {
 
 ##Authenticated functions and adapters
 
-You can implement authentication at two levels:
+You can enable authenticated access to the API at two levels:
 
 #### 1. Authenticate an entire view
 In the views.py function for a given API resource, you can change the implementing view to inherit from AuthJSONRestView instead of JSONRestView.
