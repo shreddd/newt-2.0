@@ -17,10 +17,12 @@ import logging
 logger = logging.getLogger("newt." + __name__)
 from common.shell import run_command
 from common import gridutil
+from common.decorators import login_required
 import tempfile
 import mimetypes
 import re
 
+@login_required
 def download_path(request, machine_name, path):
     """Returns a StreamingHttpResponse with the file
 
@@ -44,6 +46,7 @@ def download_path(request, machine_name, path):
         mimetype = "application/octet-stream"
     return StreamingHttpResponse(tmp_file, content_type=mimetype)
 
+@login_required
 def put_file(request, machine, path):
     """Writes the uploaded file to path and returns the path
 
@@ -72,7 +75,7 @@ def put_file(request, machine, path):
     tmp_file.close()
     return {'location': path}
 
-
+@login_required
 def get_dir(request, machine_name, path):
     """Returns a directory listing of path (as an array)
 
@@ -113,7 +116,7 @@ def get_dir(request, machine_name, path):
         logger.error("Could not get directory %s" % str(e))
         return json_response(status="ERROR", status_code=500, error="Could not get directory: %s" % str(e))
 
-
+@login_required
 def get_systems(request):
     """Returns a list of all the systems available
     """

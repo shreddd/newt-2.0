@@ -1,4 +1,4 @@
-from newt.views import JSONRestView
+from newt.views import AuthJSONRestView
 from common.response import json_response
 from django.conf import settings
 import json
@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger("newt." + __name__)
 
 # /api/store/
-class StoreRootView(JSONRestView):
+class StoreRootView(AuthJSONRestView):
     def get(self, request):
         logger.debug("Entering %s:%s" % (self.__class__.__name__, __name__))
         return store_adapter.get_store(request)
@@ -23,7 +23,7 @@ class StoreRootView(JSONRestView):
         return store_adapter.create_store(request, initial_data=initial_data)
 
 # /api/store/<store_name>/
-class StoreView(JSONRestView):
+class StoreView(AuthJSONRestView):
     def get(self, request, store_name):
         if request.GET.get("query", False):
             # Queries the store if the query parameter is set
@@ -47,7 +47,7 @@ class StoreView(JSONRestView):
         return store_adapter.delete_store(request, store_name)
 
 # /api/store/<store_name>/perms/
-class StorePermView(JSONRestView):
+class StorePermView(AuthJSONRestView):
     def get(self, request, store_name):
         return store_adapter.get_store_perms(request, store_name)
 
@@ -56,7 +56,7 @@ class StorePermView(JSONRestView):
         return store_adapter.update_store_perms(request, store_name, perms=perms)
 
 # /api/store/<store_name>/<obj_id>/
-class StoreObjView(JSONRestView):
+class StoreObjView(AuthJSONRestView):
     def get(self, request, store_name, obj_id):
         return store_adapter.store_get_obj(request, store_name, obj_id)
 
@@ -67,6 +67,6 @@ class StoreObjView(JSONRestView):
         return store_adapter.store_update(request, store_name, obj_id, data=data)
 
 # /api/store/<query>/
-class ExtraStoreView(JSONRestView):
+class ExtraStoreView(AuthJSONRestView):
     def get(self, request, query):
         return acct_adapter.extras_router(request, query)

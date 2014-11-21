@@ -5,6 +5,7 @@ import logging
 from django.http import StreamingHttpResponse
 from common.response import json_response
 import tempfile
+from common.decorators import login_required
 
 logger = logging.getLogger("newt." + __name__)
 
@@ -58,7 +59,7 @@ def put_file(request, machine, path):
     tmp_file.close()
     return {'location': path}
     
-    
+   
 def get_dir(request, machine_name, path):
     try:
         command = 'ls -la %s' % path

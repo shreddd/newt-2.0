@@ -11,6 +11,8 @@ class AcctTests(TestCase):
         self.client = MyTestClient()
 
     def test_info_ret(self):
+        self.client.post(newt_base_url + "/auth", data=login)
+
         r = self.client.get(newt_base_url + "/account/user/%s/" % login['username'])
         self.assertEquals(r.status_code, 200)
         json_response = r.json()

@@ -25,10 +25,14 @@ class StoreTests(TestCase):
             pass
 
     def test_store_basic(self):
+        self.client.post(newt_base_url + "/auth", data=login)
+
         r = self.client.get(newt_base_url + "/store")
         self.assertEquals(r.status_code, 200)
 
     def test_store_manipulation(self):
+        self.client.post(newt_base_url + "/auth", data=login)
+
         # Creates a new store (create_store)
         r = self.client.post(newt_base_url + "/store")
         self.assertEquals(r.status_code, 200)
@@ -90,6 +94,8 @@ class StoreTests(TestCase):
         self.assertEquals(r.status_code, 404)        
 
     def test_store_creation_with_initial(self):
+        self.client.post(newt_base_url + "/auth", data=login)
+
         payload = {"data": json.dumps({"x":5})}
 
         # Without an initial name

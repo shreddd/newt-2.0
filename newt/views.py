@@ -5,6 +5,7 @@ from django.http.response import HttpResponseBase
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from common.response import json_response
+from common.decorators import login_required
 
 import json
 import os
@@ -41,6 +42,23 @@ class JSONRestView(View):
         return json_response(error="Not Implemented", status="ERROR", status_code=501)
     
 
+class AuthJSONRestView(JSONRestView):
+    """
+    Authenticated version of JSONRestView that requires authentication
+    """
+    
+    @login_required
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Override the dispatch method of the class view 
+        """
+        # Wrap the dispatch method, so that we autoencode JSON
+        response = super(JSONRestView, self).dispatch(request, *args, **kwargs)
+        # If this is not an HTTPResponseBase object (Base class for responses) 
+        if not isinstance(response, HttpResponseBase):
+            response = json_response(response)
+
+        return response    
 
 
 class RootView(JSONRestView):

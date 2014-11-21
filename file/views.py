@@ -1,4 +1,6 @@
 from newt.views import JSONRestView
+from newt.views import AuthJSONRestView
+
 from common.response import json_response
 from django.http import HttpResponse, HttpResponseServerError, StreamingHttpResponse
 from django.conf import settings

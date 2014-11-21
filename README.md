@@ -155,6 +155,38 @@ NEWT_CONFIG = {
         },
 ```
 
+##Authenticated functions and adapters
+
+You can implement authentication at two levels
+1. In the views.py function for a given API resource. You can change the implementing view to inherit from AuthJSONRestView instead of JSONRestView.
+
+eg. In the store adapter views.py file, you will need to change
+```python
+from newt.views import JSONRestView
+
+class StoreView(JSONRestView):
+    def get(self, request, store_name):
+
+```    
+to
+```python
+from newt.views import AuthJSONRestView
+
+class StoreView(AuthJSONRestView):
+    def get(self, request, store_name):
+
+```
+
+2. Inside your adapter you can use the login_required decorator to force authentication on a specific function
+eg. in file/adapters/globus_file_adapter.py
+```python
+from common.decorators import login_required
+
+# Add the login_required decorator to force authentication on get_machines()
+@login_required
+def get_machines(request):
+
+```
 
 #Contributors to NEWT 2.0
 - [Shreyas Cholia](https://github.com/shreddd)

@@ -19,8 +19,10 @@ from common import gridutil
 from common.gridutil import GlobusHelper
 from common.shell import run_command
 import tempfile
+from common.decorators import login_required
 
 
+@login_required
 def get_machines(request):
     """Returns the available machines that jobs can run on
 
@@ -33,7 +35,7 @@ def get_machines(request):
             machines[machine] = attrs['jobmanagers']
     return machines
 
-
+@login_required
 def view_queue(request, machine_name):
     """Returns the current state of the queue in a list
 
@@ -61,7 +63,7 @@ def view_queue(request, machine_name):
 
     return output
 
-
+@login_required
 def submit_job(request, machine_name):
     """Submits a job to the queue
 
@@ -121,6 +123,7 @@ def submit_job(request, machine_name):
     return {"jobid":output.strip()}
 
 
+@login_required
 def get_info(request, machine_name, job_id):
     """Gets the information of a job, given the id
 
@@ -148,7 +151,7 @@ def get_info(request, machine_name, job_id):
 
     return output
 
-
+@login_required
 def delete_job(request, machine_name, job_id):
     """Gets the information of a job, given the id
 

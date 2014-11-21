@@ -17,8 +17,9 @@ import re
 logger = logging.getLogger("newt." + __name__)
 from common import gridutil 
 from common.shell import run_command
+from common.decorators import login_required
 
-
+@login_required
 def execute(request, machine_name, command):
     """Returns a the result of running command on machine_name
 
@@ -46,6 +47,7 @@ def execute(request, machine_name, command):
         logger.error("Could not run command: %s" % str(e))
         return json_response(error="Could not run command: %s" % str(e), status="ERROR", status_code=500)
 
+@login_required
 def get_systems(request):
     """Returns a list of all machines available to run commands on
     """
