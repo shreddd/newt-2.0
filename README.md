@@ -159,7 +159,8 @@ NEWT_CONFIG = {
 
 You can implement authentication at two levels:
 
-1: In the views.py function for a given API resource. You can change the implementing view to inherit from AuthJSONRestView instead of JSONRestView.
+### 1. Authenticate an entire view
+In the views.py function for a given API resource, you can change the implementing view to inherit from AuthJSONRestView instead of JSONRestView.
 
 eg. In the store adapter views.py file, you will need to change
 ```python
@@ -178,7 +179,8 @@ class StoreView(AuthJSONRestView):
 
 ```
 
-2: Inside your adapter you can use the login_required decorator to force authentication on a specific function
+### 2. Authenticate a specific adpater function
+Inside your adapter you can use the login_required decorator to force authentication on a specific function
 eg. in file/adapters/globus_file_adapter.py
 ```python
 from common.decorators import login_required
