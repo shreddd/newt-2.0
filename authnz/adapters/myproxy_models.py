@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Cred(models.Model):
     class Meta:
-        app_label = 'auth'
+        app_label = 'authnz'
     cert = models.TextField()
     key = models.TextField()
     calist = models.TextField()
