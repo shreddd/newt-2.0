@@ -131,7 +131,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'newt',
-    'auth',
+    'authnz',
     'status',
     'file',
     'store',
@@ -246,7 +246,7 @@ NEWT_CONFIG = {
             'models': "",
         }, 
         'AUTH': {
-            'adapter': 'auth.adapters.dbauth_adapter',
+            'adapter': 'authnz.adapters.dbauth_adapter',
             'models': '',
         },
         'COMMAND': {

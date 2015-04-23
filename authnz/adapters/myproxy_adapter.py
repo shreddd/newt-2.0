@@ -1,7 +1,7 @@
 from common.response import json_response
 import logging
 logger = logging.getLogger("newt." + __name__)
-from auth.adapters.myproxy_backend import MyProxyBackend
+from authnz.adapters.myproxy_backend import MyProxyBackend
 from django.contrib import auth
 
 

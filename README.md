@@ -128,16 +128,16 @@ In this case you can define a Django model (see https://docs.djangoproject.com/e
 and set the `NEWT_CONFIG['ADAPTERS'][application]['models']` to point to this in settings.py 
 
 
-For example this is how you would get Django to store a credential object in the auth adapter. Note that you need to specify the app_label in the `Meta` section of your model to point to the parent application
+For example this is how you would get Django to store a credential object in the authnz adapter. Note that you need to specify the app_label in the `Meta` section of your model to point to the parent application
 
-auth/adapters/my_models.py:
+authnz/adapters/my_models.py:
 ```python
 from django.db import models
 from django.contrib.auth.models import User
 
 class Cred(models.Model):
     class Meta:
-        app_label = 'auth'
+        app_label = 'authnz'
     cred = models.TextField()
     user = models.ForeignKey(User)
 
@@ -150,8 +150,8 @@ NEWT_CONFIG = {
     'ADAPTERS': {
 
         'AUTH': {
-            'adapter': 'auth.adapters.my_adapter',
-            'models': 'auth.adapters.my_models',
+            'adapter': 'authnz.adapters.my_adapter',
+            'models': 'authnz.adapters.my_models',
         },
 ```
 

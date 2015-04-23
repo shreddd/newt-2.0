@@ -6,7 +6,7 @@ from django.conf import settings
 import socket
 import re
 from OpenSSL import crypto, SSL
-from auth.models import Cred
+from authnz.models import Cred
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import shlex
 import os
 import urllib
 import re
-from auth.models import Cred
+from authnz.models import Cred
 import logging
 logger = logging.getLogger("newt." + __name__)
 from common.shell import run_command
