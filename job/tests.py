@@ -27,6 +27,7 @@ class JobTests(TestCase):
         self.assertIn(machine, json_response['output'].keys())
 
     def test_running_cmds(self):
+
         # Tests submitting a job
         payload = {
             "jobscript": "/bin/hostname\nsleep 10"
@@ -38,6 +39,9 @@ class JobTests(TestCase):
 
         # Get job id from submitting the job
         job_id = json_response['output']['jobid']
+
+        # Give the process time to register
+        time.sleep(1)  
 
         # Tests getting job info
         r = self.client.get(newt_base_url + "/job/"+machine+"/%s/" % job_id)
