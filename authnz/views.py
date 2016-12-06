@@ -27,4 +27,4 @@ class AuthView(JSONRestView):
 # /api/auth/<query>/
 class ExtraAuthView(JSONRestView):
     def get(self, request, query):
-        return acct_adapter.extras_router(request, query)
+        return auth_adapter.extras_router(request, query)

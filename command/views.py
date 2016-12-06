@@ -30,4 +30,4 @@ class CommandView(JSONRestView):
 # /api/command/<query>/
 class ExtraCommandView(JSONRestView):
     def get(self, request, query):
-        return acct_adapter.extras_router(request, query)
+        return command_adapter.extras_router(request, query)

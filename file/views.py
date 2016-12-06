@@ -36,4 +36,4 @@ class FileView(JSONRestView):
 # /api/file/<query>/
 class ExtraFileView(JSONRestView):
     def get(self, request, query):
-        return acct_adapter.extras_router(request, query)
+        return file_adapter.extras_router(request, query)
