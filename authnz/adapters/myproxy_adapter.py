@@ -1,8 +1,8 @@
 from common.response import json_response
 import logging
-logger = logging.getLogger("newt." + __name__)
-from authnz.adapters.myproxy_backend import MyProxyBackend
 from django.contrib import auth
+
+logger = logging.getLogger("newt." + __name__)
 
 
 def get_status(request):
@@ -12,15 +12,15 @@ def get_status(request):
     request -- Django HttpRequest
     """
     if (request.user is not None) and (request.user.is_authenticated()):
-        output=dict(auth=True,
-                    username=request.user.username,
-                    session_lifetime=request.session.get_expiry_age(),
-                    newt_sessionid=request.session.session_key)
+        output = dict(auth=True,
+                      username=request.user.username,
+                      session_lifetime=request.session.get_expiry_age(),
+                      newt_sessionid=request.session.session_key)
     else:
-        output=dict(auth=False,
-                    username=None,
-                    session_lifetime=0,
-                    newt_sessionid=None)
+        output = dict(auth=False,
+                      username=None,
+                      session_lifetime=0,
+                      newt_sessionid=None)
     return output
 
 
@@ -30,12 +30,11 @@ def login(request):
     Keyword arguments:
     request -- Django HttpRequest
     """
-    mpb = MyProxyBackend()
     username = request.POST['username'].encode("utf-8")
     password = request.POST['password'].encode("utf-8")
 
     logger.debug("Attempting to log in user: %s" % username)
-    user = mpb.authenticate(username=username, password=password)
+    user = auth.authenticate(username=username, password=password)
     if user is not None:
         auth.login(request, user)
         logger.info("Successfully logged in user: %s" % username)
@@ -56,6 +55,7 @@ def logout(request):
 patterns = (
 )
 
+
 def extras_router(request, query):
     """Maps a query to a function if the pattern matches and returns result
 
@@ -71,7 +71,7 @@ def extras_router(request, query):
             return func(**match.groupdict())
 
     # Returns an Unimplemented response if no pattern matches
-    return json_response(status="Unimplemented", 
-                             status_code=501, 
-                             error="", 
-                             content="query: %s" % query)
+    return json_response(status="Unimplemented",
+                         status_code=501,
+                         error="",
+                         content="query: %s" % query)
