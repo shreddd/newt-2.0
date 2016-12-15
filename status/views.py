@@ -20,4 +20,4 @@ class StatusView(JSONRestView):
 
 class ExtraStatusView(JSONRestView):
     def get(self, request, query):
-        return acct_adapter.extras_router(request, query)
+        return adapter.extras_router(request, query)

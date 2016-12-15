@@ -33,4 +33,4 @@ class JobDetailView(JSONRestView):
 # /api/jobs/<query>/
 class ExtraJobView(JSONRestView):
     def get(self, request, query):
-        return acct_adapter.extras_router(request, query)
+        return job_adapter.extras_router(request, query)

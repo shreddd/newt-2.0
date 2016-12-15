@@ -1,6 +1,8 @@
 NEWT 2.0
 ========
 
+[![CircleCI](https://circleci.com/gh/NERSC/newt-2.0.svg?style=svg)](https://circleci.com/gh/NERSC/newt-2.0)
+
 NEWT - Nice and Easy Web Toolkit, a ReSTFul API for High Performance Computing.
 
 #Modules

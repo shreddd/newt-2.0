@@ -69,4 +69,4 @@ class StoreObjView(AuthJSONRestView):
 # /api/store/<query>/
 class ExtraStoreView(AuthJSONRestView):
     def get(self, request, query):
-        return acct_adapter.extras_router(request, query)
+        return store_adapter.extras_router(request, query)

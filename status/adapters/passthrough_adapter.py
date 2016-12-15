@@ -5,6 +5,7 @@ from common.response import json_response
 import logging
 logger = logging.getLogger("newt." + __name__)
 
+
 def get_status(machine_name=None):
     """ Returns the status of a given machine (if machine_name is set),
         otherwise the statuses of all the machines
@@ -13,21 +14,22 @@ def get_status(machine_name=None):
     machine_name -- (optional) name of the machine
     """
     base_url = settings.STATUS_URL
-    if machine_name==None:
+    if machine_name is None:
         url = base_url
     else:
         url = '%s?%s=%s' % (base_url, 'system', machine_name)
-    
+
     r = requests.get(url)
     data = r.json()
     if data['status'] == "unknown":
-        return json_response(status="ERROR", 
-                             status_code=400, 
-                             error="Unrecognized system: %s" % machine_name))
+        return json_response(status="ERROR",
+                             status_code=400,
+                             error="Unrecognized system: %s" % machine_name)
     return data
 
 patterns = (
 )
+
 
 def extras_router(request, query):
     """Maps a query to a function if the pattern matches and returns result
@@ -44,7 +46,7 @@ def extras_router(request, query):
             return func(**match.groupdict())
 
     # Returns an Unimplemented response if no pattern matches
-    return json_response(status="Unimplemented", 
-                             status_code=501, 
-                             error="", 
-                             content="query: %s" % query)
+    return json_response(status="Unimplemented",
+                         status_code=501,
+                         error="",
+                         content="query: %s" % query)

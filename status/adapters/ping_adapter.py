@@ -1,6 +1,5 @@
 # Ping Status Adapter
 from django.conf import settings
-import os
 from common.shell import run_command
 from common.response import json_response
 import logging
@@ -15,6 +14,7 @@ def ping(machine_name, hostname):
     else:
         return {'system': machine_name, 'status': 'down'}
 
+
 def get_status(machine_name=None):
     """ Returns the status of a given machine (if machine_name is set),
         otherwise the statuses of all the machines
@@ -24,24 +24,24 @@ def get_status(machine_name=None):
     """
     conf = settings.NEWT_CONFIG
 
-    if machine_name == None:
-        return [ ping(s['NAME'], s['HOSTNAME']) for s in conf['SYSTEMS'] ] 
-            
-    else: 
+    if machine_name is None:
+        return [ping(s['NAME'], s['HOSTNAME']) for s in conf['SYSTEMS']]
+    else:
         hostname = None
         for s in conf['SYSTEMS']:
-            if machine_name==s['NAME']:
+            if machine_name == s['NAME']:
                 hostname = s['HOSTNAME']
                 break
 
         if hostname is None:
-            return json_response(status="ERROR", 
-                                 status_code=404, 
+            return json_response(status="ERROR",
+                                 status_code=404,
                                  error="Unrecognized system: %s" % machine_name)
         return ping(machine_name, hostname)
 
 patterns = (
 )
+
 
 def extras_router(request, query):
     """Maps a query to a function if the pattern matches and returns result
@@ -58,7 +58,7 @@ def extras_router(request, query):
             return func(**match.groupdict())
 
     # Returns an Unimplemented response if no pattern matches
-    return json_response(status="Unimplemented", 
-                             status_code=501, 
-                             error="", 
-                             content="query: %s" % query)
+    return json_response(status="Unimplemented",
+                         status_code=501,
+                         error="",
+                         content="query: %s" % query)
