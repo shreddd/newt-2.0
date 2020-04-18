@@ -1,5 +1,5 @@
 Django==1.6.5
-netaddr==0.7.11
+netaddr==0.7.19
 pyOpenSSL==0.14
 pymongo==2.7.1
 pytz==2014.4
