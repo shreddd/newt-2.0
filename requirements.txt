@@ -1,6 +1,6 @@
 Django==1.6.5
 netaddr==0.7.11
-pyOpenSSL==0.14
+pyOpenSSL==17.5.0
 pymongo==2.7.1
 pytz==2014.4
 redis==2.10.1
