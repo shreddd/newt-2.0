@@ -3,7 +3,7 @@ netaddr==0.7.11
 pyOpenSSL==0.14
 pymongo==2.7.1
 pytz==2014.4
-redis==2.10.1
+redis==3.5.3
 requests==2.3.0
 wsgiref==0.1.2
 python-magic
